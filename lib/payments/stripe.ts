@@ -185,6 +185,7 @@ export async function getStripeProducts(active?:boolean) {
     id: product.id,
     name: product.name,
     description: product.description,
+    imageUrl: product.images[0] || null,
     active: product.active,
     defaultPriceId:
       typeof product.default_price === 'string'

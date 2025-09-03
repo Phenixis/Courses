@@ -15,7 +15,7 @@ export default function Logo({
 
     return (
         <Link href="/" className={`flex items-center justify-center ${className}`}>
-            <Image src="/icon.svg" alt={appName} width={32} height={32} />
+            <Image src="/public/icon.svg" alt={appName} width={32} height={32} />
             {
                 title ? (
                     <h1 className="ml-2 text-xl font-semibold text-gray-900 dark:text-slate-100">

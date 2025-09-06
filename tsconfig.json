@@ -34,7 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/(app)/settings/admin/pricing/actions.js"
+    "app/(app)/settings/admin/products/actions.js"
   ],
   "exclude": [
     "node_modules"

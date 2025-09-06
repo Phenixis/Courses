@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import ProductsDisplay from './productsDisplay';
 
 export const metadata: Metadata = {
-    title: 'Pricing',
-    description: 'Manage your product pricing',
+    title: 'Products',
+    description: 'Manage your products',
 };
 
 export default function PricingPage() {
@@ -13,7 +13,7 @@ export default function PricingPage() {
         <section className="flex-1 p-4 lg:p-8">
             <div className="flex justify-between items-center">
                 <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100 mb-6">
-                    Pricing
+                    Products
                 </h1>
             </div>
             <Suspense fallback={<ProductsDisplay />}>

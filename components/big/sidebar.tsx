@@ -82,7 +82,7 @@ export function Sidebar() {
 
     const adminNavItems = [
         { href: '/settings/admin', icon: SettingsIcon, label: 'General' },
-        { href: '/settings/admin/pricing', icon: DollarSign, label: 'Pricing' },
+        { href: '/settings/admin/products', icon: DollarSign, label: 'Products' },
         { href: '/settings/admin/tickets', icon: Ticket, label: 'Tickets' },
     ]
 

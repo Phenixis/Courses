@@ -26,19 +26,19 @@ export default function ToggleProduct({
             const result = await toggleProductStatus(productId, currentStatus)
 
             if (result.success) {
-                toast("Product status updated.",
+                toast.success("Product status updated.",
                     {
                         description: `Product is now ${!currentStatus ? "active" : "inactive"}.`,
                     });
             } else {
-                toast("Error updating product status.",
+                toast.error("Error updating product status.",
                     {
                         description: result.error,
                     })
                 setStatus(currentStatus)
             }
         } catch (error: any) {
-            toast("Error updating product status.",
+            toast.error("Error updating product status.",
                 {
                     description: error.message,
                 })

@@ -70,7 +70,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: foundTeam, priceId });
+    return createCheckoutSession({ priceId });
   }
 
   redirect('/dashboard');
@@ -179,7 +179,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: createdTeam, priceId });
+    return createCheckoutSession({ priceId });
   }
 
   redirect('/sign-up/step2');

@@ -184,7 +184,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     return createCheckoutSession({ priceId });
   }
 
-  redirect('/sign-up/step2');
+  redirect('/onboard/sign-up/step-2');
 });
 
 import { signOut as googleSignOut } from "@/auth"

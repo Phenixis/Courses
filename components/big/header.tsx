@@ -23,13 +23,13 @@ export default function Header({
                 <Logo title />
                 <Feedback />
                 <div className="flex items-center space-x-4">
-                    <DarkModeToggle />
                     <Link
                         href="/products"
                         className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 hover:dark:text-gray-100"
                     >
                         Products
                     </Link>
+                    <DarkModeToggle />
                     {user ? (
                         <UserAvatar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} user={user} setUser={setUser} />
                     ) : (

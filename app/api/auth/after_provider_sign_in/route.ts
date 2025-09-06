@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
             return createCheckoutSession({ priceId });
         }
 
-        return NextResponse.redirect('/sign-up/step2');
+        return NextResponse.redirect('/onboard/sign-up/step-2');
     } else {
         if (redirect === 'checkout') {
             if (!priceId) {

@@ -1,6 +1,7 @@
 import * as lib from "./library"
 import { teamTable } from "../schema/team"
 import { userTable } from "../schema/user"
+import { teamMemberTable } from "../schema/team"
 
 export async function getTeamByStripeCustomerId(customerId: string) {
   const result = await lib.db
@@ -35,12 +36,15 @@ export async function getUserWithTeam(userId: string) {
     .select({
       user: userTable,
       teamId: teamTable.id,
+      role: teamMemberTable.role,
+      joinedAt: teamMemberTable.joinedAt,
     })
     .from(userTable)
-    .leftJoin(teamTable, lib.eq(userTable.id, teamTable.id))
+    .leftJoin(teamMemberTable, lib.eq(userTable.id, teamMemberTable.userId))
+    .leftJoin(teamTable, lib.eq(teamMemberTable.teamId, teamTable.id))
     .where(lib.eq(userTable.id, userId))
     .limit(1);
-
+    
   return result[0];
 }
 

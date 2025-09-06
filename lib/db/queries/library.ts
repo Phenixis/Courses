@@ -7,6 +7,7 @@ export {
     isNull, 
     isNotNull, 
     count,
-    not
+    not,
+    sql
 } from 'drizzle-orm';
 export { db } from '../drizzle';

@@ -1,31 +1,49 @@
-import { getStripeProducts } from "@/lib/payments/stripe";
+import { getStripeProductById } from "@/lib/payments/stripe";
+import { getChaptersByProductId } from "@/lib/db/queries/chapter";
 
-export interface ProductProps {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    stripe_product_id: string;
-}
+export default async function Product({ stripeProductId }: { stripeProductId: string }) {
+    const product = await getStripeProductById(stripeProductId);
 
-export default async function Product({ product }: { product: ProductProps }) {
-    const { id, title, subtitle, description, stripe_product_id } = product;
+    if (!product) {
+        return <div>Product not found</div>;
+    }
 
-    const products = await getStripeProducts();
+    const chapters = await getChaptersByProductId(stripeProductId);
 
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
             <figure className="w-1/5 mr-2 flex-shrink-0">
-                <img src={products.find(p => p.id === stripe_product_id)?.imageUrl || "/path/to/image.jpg"} alt="Product Image" className="w-full border-2 rounded" />
-                <figcaption className="text-center mt-2">{title}</figcaption>
+                <img src={product?.images[0] || "/path/to/image.jpg"} alt="Product Image" className="w-full border-2 rounded" />
+                <figcaption className="text-center mt-2">{product?.name}</figcaption>
             </figure>
             <div className="flex flex-col justify-between w-full p-4 flex-grow">
                 <header>
-                    <h2 className="text-xl font-semibold">{title}</h2>
-                    <h3 className="text-lg font-medium">{subtitle}</h3>
+                    <h2 className="text-3xl font-semibold">{product?.name.toUpperCase()}</h2>
+                    <h3 className="text-xl font-light">{product?.description}</h3>
                 </header>
-                <p className="text-gray-600">{description}</p>
-                <button className="w-32 bg-blue-500 text-white px-4 py-2 rounded">Add to Cart</button>
+                <section className="py-4 flex-grow flex justify-between">
+                    <article>
+                        <h4 className="font-semibold mb-2">What you'll learn</h4>
+                        <ul>
+                            {chapters.map(chapter => (
+                                <li key={chapter.id} className="mb-1">• {chapter.title}</li>
+                            ))}
+                        </ul>
+                    </article>
+                    <article>
+                        <h4 className="font-semibold mb-2">Free Bonuses</h4>
+                        <ul>
+                            <li>Advanced boilerplate to launch your project in days - value <span className="font-bold">249€</span></li>
+                        </ul>
+                    </article>
+                </section>
+                <footer className="flex justify-end">
+                    <button className="w-32 bg-blue-500 text-white px-4 py-2 rounded-full font-bold">
+                        {product?.default_price && typeof product.default_price === "object" && "unit_amount" in product.default_price && typeof product.default_price.unit_amount === "number"
+                            ? (product.default_price.unit_amount / 100) + "€"
+                            : "Free"}
+                    </button>
+                </footer>
             </div>
         </article>
     )

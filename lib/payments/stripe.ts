@@ -168,7 +168,7 @@ export async function getStripePrices(active?: boolean) {
   }));
 }
 
-export async function getStripeProducts(active?:boolean) {
+export async function getStripeProducts(active?: boolean) {
   const listParams = {
     expand: ['data.default_price'],
   } as Stripe.ProductListParams;
@@ -194,6 +194,18 @@ export async function getStripeProducts(active?:boolean) {
   }));
 }
 
+export async function getStripeProductById(id: string) {
+  try {
+    const product = await stripe.products.retrieve(id, {
+      expand: ['default_price'],
+    });
+    return product;
+  } catch (error) {
+    console.error('Error retrieving product from Stripe:', error);
+    return null;
+  }
+}
+
 export type StripeProductWithPrices = {
   id: string;
   name: string;
@@ -215,9 +227,9 @@ export async function getStripeProductsAndPrices() {
   const prices = await getStripePrices(true);
 
   return products.map(product => {
-      return {
-          ...product,
-          prices: prices.filter(price => price.productId === product.id)
-      } as StripeProductWithPrices;
+    return {
+      ...product,
+      prices: prices.filter(price => price.productId === product.id)
+    } as StripeProductWithPrices;
   });
 }

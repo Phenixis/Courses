@@ -21,3 +21,6 @@ export * from "./session"
 /* Tickets reporting */
 export * from "./ticket-comment"
 export * from "./ticket"
+
+/* Chapters */
+export * from "./chapter"

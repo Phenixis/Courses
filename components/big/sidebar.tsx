@@ -125,7 +125,7 @@ export function Sidebar() {
                                     <CollapsibleContent>
                                         <nav className="h-full overflow-y-auto p-2">
                                             {item.map((subItem) => (
-                                                <Link key={subItem.href} href={subItem.href} passHref>
+                                                <Link key={subItem.href} href={subItem.href}>
                                                     <Button
                                                         variant={subItem.href === active ? 'secondary' : 'ghost'}
                                                         className={`p-2 mt-1 w-full justify-start`}

@@ -306,7 +306,9 @@ export const updateAccount = validatedActionWithUser(
   updateAccountSchema,
   async (data, _, user) => {
     const { name, email, context } = data;
+
     const userWithTeam = await getUserWithTeam(user.id);
+    
 
     await Promise.all([
       db.update(userTable).set({ name, email }).where(eq(userTable.id, user.id)),

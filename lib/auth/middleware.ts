@@ -58,16 +58,18 @@ type ActionWithTeamFunction<T> = (
   team: TeamDataWithMembers
 ) => Promise<T>;
 
-export function withTeam<T>(action: ActionWithTeamFunction<T>) {
+export function withTeam<T>(action: ActionWithTeamFunction<T>, redirectIfError: string = '/login') {
   return async (formData: FormData): Promise<T> => {
     const user = await getUser();
+    
     if (!user) {
-      redirect('/sign-in');
+      redirect(redirectIfError);
     }
 
     const team = await getTeamForUser(user.id);
+
     if (!team) {
-      throw new Error('Team not found');
+      throw new Error('Team not found for user [' + user.id + '].');
     }
 
     return action(formData, team);

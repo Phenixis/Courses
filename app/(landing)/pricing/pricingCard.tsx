@@ -1,4 +1,4 @@
-import { SubmitButton } from './submit-button';
+import { SubmitButton } from '@/components/products/submit-button';
 import { checkoutAction } from '@/lib/payments/actions';
 import { Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardFooter, CardTitle } from '@/components/ui/card';

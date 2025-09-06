@@ -1,7 +1,7 @@
 "use client";
 
 import Logo from '@/components/big/logo';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signIn as googleSignIn } from "next-auth/react"
 
@@ -17,6 +17,13 @@ function getTitle() {
 }
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const page = pathname.split('/').pop();
+    const inviteId = searchParams.get('inviteId');
+    const priceId = searchParams.get('priceId');
+    const redirect = searchParams.get('redirect');
+
     return (
         <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
             <div className="sm:mx-auto sm:w-full sm:max-w-md flex gap-4 items-center justify-center">
@@ -31,7 +38,7 @@ export default function LoginLayout({ children }: { children: React.ReactNode })
                     <Button
                         className="w-full flex justify-center items-center py-2 px-4 border rounded-full shadow-sm text-sm font-medium"
                         variant={"outline"}
-                        onClick={() => googleSignIn("google", { redirectTo: "/dashboard" })}
+                        onClick={() => googleSignIn("google", { redirectTo: `/api/auth/after_provider_sign_in?from=${page}&inviteId=${inviteId}&priceId=${priceId}&redirect=${redirect}` })}
                     >
                         <img src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA" className="h-6 w-6 mr-2" alt="Google Logo" />
                         {getTitle()} with Google

@@ -1,9 +1,10 @@
 import NextAuth from "next-auth"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import { db } from "@/lib/db/drizzle"
+import { eq } from "drizzle-orm"
 import authConfig from "./auth.config"
-import { getTeamForUser } from "./lib/db/queries"
-import { userTable, accountTable, authenticatorTable, sessionTable, NewTeam, teamTable, ActivityType, NewTeamMember, teamMemberTable } from "@/lib/db/schema"
+import { getTeamForUser, getUser, createUser } from "./lib/db/queries"
+import { userTable, accountTable, authenticatorTable, sessionTable, NewTeam, teamTable, ActivityType, NewTeamMember, teamMemberTable, NewAccount } from "@/lib/db/schema"
 import { logActivity } from "@/lib/db/queries"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -18,48 +19,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: { strategy: "jwt" },
   callbacks: {
-    async signIn(params) {
-      if (!params?.user.id) {
-        return false;
-      }
+    // async signIn(params) {
+    //   const userId = params?.user.id;
+    //   const email = params?.user.email;
 
-      const userWithTeam = await getTeamForUser(params?.user.id);
+    //   if (!email) {
+    //     return false;
+    //   }
+      
+    //   if (!userId) {
+    //     return false;
+    //   }
 
-      if (!userWithTeam) {
-        const newTeam: NewTeam = {
-          name: `${params?.user.email}'s Team`,
-        };
+    //   const isUserCreated = await db.select().from(userTable).where(eq(userTable.id, userId)).limit(1);
 
-        const [createdTeam] = await db.insert(teamTable).values(newTeam).returning();
+    //   const userWithTeam = await getTeamForUser(userId);
 
-        if (!createdTeam) {
-          return false;
-        }
+    //   if (!userWithTeam) {
+    //     const newTeam: NewTeam = {
+    //       name: `${params?.user.email}'s Team`,
+    //     };
 
-        const teamId = createdTeam.id;
-        const userRole = 'owner';
+    //     const [createdTeam] = await db.insert(teamTable).values(newTeam).returning();
 
-        await logActivity(teamId, params?.user.id, ActivityType.CREATE_TEAM);
+    //     if (!createdTeam) {
+    //       return false;
+    //     }
 
-        const newTeamMember: NewTeamMember = {
-          userId: params?.user.id,
-          teamId: teamId,
-          role: userRole,
-        };
+    //     const teamId = createdTeam.id;
+    //     const userRole = 'owner';
 
-        await Promise.all([
-          db.insert(teamMemberTable).values(newTeamMember),
-          logActivity(teamId, params?.user.id, ActivityType.SIGN_UP),
-        ]);
-      } else {
-        await Promise.all([
-          logActivity(userWithTeam.id, params?.user.id, ActivityType.SIGN_IN),
-        ]);
+    //     await logActivity(teamId, userId, ActivityType.CREATE_TEAM);
 
-      }
+    //     const newTeamMember: NewTeamMember = {
+    //       userId: userId,
+    //       teamId: teamId,
+    //       role: userRole,
+    //     };
 
-      return true
-    }
+    //     await Promise.all([
+    //       db.insert(teamMemberTable).values(newTeamMember),
+    //       logActivity(teamId, userId, ActivityType.SIGN_UP),
+    //     ]);
+    //   } else {
+    //     await Promise.all([
+    //       logActivity(userWithTeam.id, userId, ActivityType.SIGN_IN),
+    //     ]);
+    //   }
+
+    //   return true
+    // }
   },
   ...authConfig,
 })

@@ -1,6 +1,6 @@
 import * as lib from "./library"
 import { getSession } from '@/lib/auth/session';
-import { userTable } from "../schema/user"
+import { userTable, type NewUser } from "../schema/user"
 
 export async function getUser(id?: string) {
   if (!id) {
@@ -68,4 +68,15 @@ export async function getNumberUsers() {
     })
     .from(userTable)
     .where(lib.isNull(userTable.deletedAt));
+}
+
+export async function createUser(
+  user: NewUser
+) {
+  const [createdUser] = await lib.db
+    .insert(userTable)
+    .values(user)
+    .returning();
+
+  return createdUser;
 }

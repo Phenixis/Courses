@@ -143,6 +143,8 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         .from(teamTable)
         .where(eq(teamTable.id, teamId))
         .limit(1);
+
+      await db.update(userTable).set({role: userRole}).where(eq(userTable.id, createdUser.id));
     } else {
       return { error: 'Invalid or expired invitation.' };
     }
@@ -308,7 +310,7 @@ export const updateAccount = validatedActionWithUser(
     const { name, email, context } = data;
 
     const userWithTeam = await getUserWithTeam(user.id);
-    
+
 
     await Promise.all([
       db.update(userTable).set({ name, email }).where(eq(userTable.id, user.id)),

@@ -33,3 +33,6 @@ export const accountRelations = lib.relations(accountTable, ({ one }) => ({
     references: [userTable.id],
   }),
 }));
+
+export type Account = typeof accountTable.$inferSelect;
+export type NewAccount = typeof accountTable.$inferInsert;

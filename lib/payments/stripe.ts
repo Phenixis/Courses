@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Team } from '@/lib/db/schema';
 import {
   getTeamByStripeCustomerId,
+  getTeamForUser,
   getUser,
   updateTeamSubscription,
 } from '@/lib/db/queries';
@@ -12,18 +13,29 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function createCheckoutSession({
-  team,
   priceId,
 }: {
-  team: Team | null;
   priceId: string;
 }) {
-  const user = await getUser();
   const price = await stripe.prices.retrieve(priceId);
 
-  if (!team || !user) {
-    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+  if (!price || !price.active) {
+    redirect('/products');
   }
+
+  const user = await getUser();
+  const redirectIfError = `/login?redirect=checkout&priceId=${priceId}`;
+
+  if (!user) {
+    redirect(redirectIfError);
+  }
+
+  const team = await getTeamForUser(user.id);
+  
+  if (!team) {
+    redirect(redirectIfError);
+  }
+  
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -33,11 +45,12 @@ export async function createCheckoutSession({
         quantity: 1,
       },
     ],
-    mode: 'subscription',
+    mode: price.recurring ? 'subscription' : 'payment',
     success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.BASE_URL}/pricing`,
+    cancel_url: `${process.env.BASE_URL}/products`,
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
+    customer_email: user.email || undefined,
     allow_promotion_codes: true,
     subscription_data: {
       trial_period_days: price.recurring?.trial_period_days || undefined,

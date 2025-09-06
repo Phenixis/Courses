@@ -1,5 +1,6 @@
 import { getStripeProductById } from "@/lib/payments/stripe";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
+import { checkoutAction } from "@/lib/payments/actions";
 
 export default async function Product({ stripeProductId }: { stripeProductId: string }) {
     const product = await getStripeProductById(stripeProductId);
@@ -38,13 +39,16 @@ export default async function Product({ stripeProductId }: { stripeProductId: st
                     </article>
                 </section>
                 <footer className="flex justify-end">
-                    <button className="w-32 bg-blue-500 text-white px-4 py-2 rounded-full font-bold">
-                        {product?.default_price && typeof product.default_price === "object" && "unit_amount" in product.default_price && typeof product.default_price.unit_amount === "number"
-                            ? (product.default_price.unit_amount / 100) + "€"
-                            : "Free"}
-                    </button>
+                    {product?.default_price && typeof product.default_price === "object" && "unit_amount" in product.default_price && typeof product.default_price.unit_amount === "number" ? (
+                        <form action={checkoutAction}>
+                            <input type="hidden" name="priceId" value={product.default_price.id} />
+                            <button className="w-32 bg-blue-500 text-white px-4 py-2 rounded-full font-bold">
+                                {(product.default_price.unit_amount / 100) + "€"}
+                            </button>
+                        </form>
+                    ) : "Free"}
                 </footer>
             </div>
-        </article>
+        </article >
     )
 }

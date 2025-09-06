@@ -156,7 +156,7 @@ export default function Page() {
 
                     <div className="flex items-center justify-center">
                         <Link
-                            href={`/sign-up`}
+                            href={`/sign-up${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
                             className="text-sm text-gray-600 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
                         >
                             Back to our old login flow

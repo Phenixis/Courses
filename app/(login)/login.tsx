@@ -130,8 +130,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                             )}
                         </Button>
                         <Link
-                            href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${redirect ? `?redirect=${redirect}` : ''
-                                }${priceId ? `&priceId=${priceId}` : ''}`}
+                            href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
                             className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary basis-2/5"
                         >
                             {mode === 'signin'
@@ -142,7 +141,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
 
                     <div className="flex items-center justify-center">
                         <Link
-                            href={`/login`}
+                            href={`/login${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
                             className="text-sm text-gray-600 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
                         >
                             Try our new login flow

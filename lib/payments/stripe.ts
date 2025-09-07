@@ -48,6 +48,7 @@ export async function createCheckoutSession({
     mode: price.recurring ? 'subscription' : 'payment',
     success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.BASE_URL}/products`,
+    customer_creation: 'always',
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     customer_email: user.email || undefined,

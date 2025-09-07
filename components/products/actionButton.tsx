@@ -1,6 +1,7 @@
 import { PersonalizedPrice } from "@/lib/db/schema";
 import { checkoutAction } from "@/lib/payments/actions";
 import { SubmitButton } from "./submitButton";
+import Link from "next/link";
 
 function formatPrice(
     amount: number,
@@ -31,9 +32,9 @@ export function ActionButton({
     return skeleton === true ? (
         <SubmitButton title="Loading..." skeleton />
     ) : price === undefined || price.unit_amount === null || hasAccess ? (
-        <a href={`/products/${product_id}`} className="w-fit">
+        <Link href={`/courses/${product_id}`} className="w-fit">
             <SubmitButton title="Access the course" />
-        </a>
+        </Link>
     ) : price.unit_amount ? (
         <form className="flex flex-col justify-end items-end" action={checkoutAction}>
             <input type="hidden" name="priceId" value={price?.id} />

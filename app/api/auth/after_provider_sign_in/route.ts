@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
             [createdTeam] = await db.insert(teamTable).values(newTeam).returning();
 
             if (!createdTeam) {
-                return { error: 'Failed to create team. Please try again.' };
+                return  NextResponse.redirect(process.env.BASE_URL + '/?error=failed_to_create_team');
             }
 
             teamId = createdTeam.id;

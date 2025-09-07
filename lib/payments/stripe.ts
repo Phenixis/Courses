@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { redirect } from 'next/navigation';
-import { Team } from '@/lib/db/schema';
+import { Team, PersonalizedPrice } from '@/lib/db/schema';
 import {
   getTeamByStripeCustomerId,
   getTeamForUser,
@@ -174,11 +174,17 @@ export async function getStripePrices(active?: boolean) {
     id: price.id,
     productId:
       typeof price.product === 'string' ? price.product : price.product.id,
-    unitAmount: price.unit_amount,
+    unit_amount: price.unit_amount,
     currency: price.currency,
     interval: price.recurring?.interval || "one-time",
     trialPeriodDays: price.recurring?.trial_period_days || 0,
-  }));
+  })) as PersonalizedPrice[];
+}
+
+export async function getStripePricesOfProduct(productId: string, active?: boolean) {
+  const prices = await getStripePrices(active);
+
+  return prices.filter(price => price.productId === productId);
 }
 
 export async function getStripeProducts(active?: boolean) {
@@ -225,14 +231,7 @@ export type StripeProductWithPrices = {
   description: string | null;
   active: boolean;
   defaultPriceId: string | undefined;
-  prices: {
-    id: string;
-    productId: string;
-    unitAmount: number | null;
-    currency: string;
-    interval: Stripe.Price.Recurring.Interval | undefined;
-    trialPeriodDays: number | null | undefined;
-  }[];
+  prices: PersonalizedPrice[];
 };
 
 export async function getStripeProductsAndPrices() {

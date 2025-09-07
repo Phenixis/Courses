@@ -3,6 +3,8 @@
  * Comment and uncomment the table as needed
  */
 
+import { Stripe } from "stripe"
+
 /* Account for google, github, ... authentification */
 export * from "./account"
 export * from "./authenticator"
@@ -24,3 +26,13 @@ export * from "./ticket"
 
 /* Chapters */
 export * from "./chapter"
+
+
+export type PersonalizedPrice = {
+  id: string;
+  productId: string;
+  unit_amount: number | null;
+  currency: string;
+  interval: Stripe.Price.Recurring.Interval | undefined;
+  trialPeriodDays: number | null | undefined;
+};

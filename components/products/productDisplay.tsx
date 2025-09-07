@@ -29,14 +29,16 @@ function SubmitButtonOld({
 }
 
 export function ProductDisplay({
-    product
+    product,
+    hasAccess
 }: {
     product?: {
         stripeProduct: BasicProduct,
         prices: PersonalizedPrice[],
         chapters: Chapter[],
         bonuses: { title: string, value: number }[]
-    }
+    },
+    hasAccess: boolean
 }) {
     const searchParams = useSearchParams();
     const currency = searchParams.get("currency") || "eur";
@@ -44,8 +46,6 @@ export function ProductDisplay({
     const priceInPrices = product ? product.prices.find(price => price.currency.toLowerCase() === currency.toLowerCase()) : null;
     const priceToUse = priceInPrices || (product ? product.prices.find(price => price.id === product.stripeProduct.defaultPriceId) : null);
     const isChosenCurrency = priceToUse === priceInPrices;
-
-    const hasAccess = false; // TODO: Replace with actual access check
 
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">

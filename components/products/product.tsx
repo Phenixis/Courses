@@ -1,6 +1,7 @@
 import { getStripeProductById } from "@/lib/payments/stripe";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
 import { checkoutAction } from "@/lib/payments/actions";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 export default async function Product({ stripeProductId }: { stripeProductId: string }) {
     const product = await getStripeProductById(stripeProductId);
@@ -14,8 +15,10 @@ export default async function Product({ stripeProductId }: { stripeProductId: st
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
             <figure className="w-1/5 mr-2 flex-shrink-0">
-                <img src={product?.images[0] || "/path/to/image.jpg"} alt="Product Image" className="w-full border-2 rounded" />
-                <figcaption className="text-center mt-2">{product?.name}</figcaption>
+                <AspectRatio ratio={21/29.7} className="w-full h-full">
+                    <img src={product?.images[0] || "/path/to/image.jpg"} alt="Product Image" className="w-full h-full border-2 rounded bg-slate-200" />
+                </AspectRatio>
+                <figcaption className="sr-only text-center mt-2">{product?.name}</figcaption>
             </figure>
             <div className="flex flex-col justify-between w-full p-4 flex-grow">
                 <header>

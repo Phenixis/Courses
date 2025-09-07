@@ -144,7 +144,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         .where(eq(teamTable.id, teamId))
         .limit(1);
 
-      await db.update(userTable).set({role: userRole}).where(eq(userTable.id, createdUser.id));
+      await db.update(userTable).set({ role: userRole }).where(eq(userTable.id, createdUser.id));
     } else {
       return { error: 'Invalid or expired invitation.' };
     }
@@ -373,16 +373,13 @@ export const inviteTeamMember = validatedActionWithUser(
       return { error: 'User is not part of a team' };
     }
 
-    const existingMember = await db
+    const teamMembers = await db
       .select()
       .from(userTable)
       .leftJoin(teamMemberTable, eq(userTable.id, teamMemberTable.userId))
-      .where(
-        and(eq(userTable.email, email), eq(teamMemberTable.teamId, userWithTeam.teamId))
-      )
-      .limit(1);
+      .where(eq(teamMemberTable.teamId, userWithTeam.teamId));
 
-    if (existingMember.length > 0) {
+    if (teamMembers.find(member => member.user.email === email)) {
       return { error: 'User is already a member of this team' };
     }
 
@@ -401,6 +398,10 @@ export const inviteTeamMember = validatedActionWithUser(
 
     if (existingInvitation.length > 0) {
       return { error: 'An invitation has already been sent to this email' };
+    }
+
+    if (teamMembers.length >= 5) {
+      return { error: 'Team member limit reached.' };
     }
 
     // Create a new invitation

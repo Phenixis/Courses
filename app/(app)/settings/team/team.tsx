@@ -59,7 +59,12 @@ export function TeamSettings({ teamData }: { teamData: TeamDataWithMembers }) {
       </Card>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>
+            Team Members
+            <span className="text-sm text-muted-foreground ml-2">
+              ({teamData.teamMembers.length}/5)
+            </span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-4">

@@ -70,6 +70,7 @@ export function Sidebar() {
 
     const dashboardNavItems = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+        { href: '/courses', icon: Home, label: 'Courses' },
     ]
 
     const settingsNavItems = [

@@ -2,8 +2,10 @@ import { Product } from '@/components/products/product';
 import { ProductDisplay } from '@/components/products/productDisplay';
 import { Suspense } from 'react';
 import { CurrencySelect } from '@/components/products/currencySelect';
+import { getStripeProducts } from '@/lib/payments/stripe';
 
 export default async function ProductsPage() {
+    const products = await getStripeProducts(true);
 
     return (
         <main className="max-w-7xl w-full flex-grow mx-auto p-4">
@@ -13,10 +15,18 @@ export default async function ProductsPage() {
                 </h1>
                 <CurrencySelect />
             </header>
-            <section className="">
-                <Suspense fallback={<ProductDisplay />}>
-                    <Product stripeProductId="prod_Sz70bFdPcvk1BE" />
-                </Suspense>
+            <section>
+                {
+                    products.length === 0 ? (
+                        <p>No products found.</p>
+                    ) : (
+                        products.map(product => (
+                            <Suspense key={product.id} fallback={<ProductDisplay />}>
+                                <Product stripeProductId={product.id} />
+                            </Suspense>
+                        ))
+                    )
+                }
             </section>
         </main>
     );

@@ -24,5 +24,5 @@ export async function Product({ stripeProductId }: { stripeProductId: string }) 
             title: "Advanced boilerplate to launch your project in days",
             value: 249
         }]
-    }} hasAccess={hasAccess} />;
+    }} hasAccess={hasAccess} isAdmin={user !== null && user.role === "admin"} />;
 }

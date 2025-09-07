@@ -1,36 +1,20 @@
 "use client"
 
 import { type PersonalizedPrice } from "@/lib/db/schema";
-import { checkoutAction } from "@/lib/payments/actions";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Chapter } from "@/lib/db/schema/chapter";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import type { BasicProduct } from "@/lib/payments/stripe";
-import { SubmitButton } from "./submitButton";
-import { ActionButton } from "./productButton";
+import { ActionButton } from "./actionButton";
 import { Badge } from "../ui/badge";
-
-function SubmitButtonOld({
-    title,
-    skeleton = false
-}: {
-    title: string,
-    skeleton?: boolean
-}) {
-    return !skeleton ?
-        (
-            <button className="w-32 bg-blue-500 text-white px-4 py-2 rounded-full font-bold">
-                {title}
-            </button>
-        ) : (
-            <Skeleton className="h-10 w-32 rounded-full" />
-        );
-}
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export function ProductDisplay({
     product,
-    hasAccess
+    hasAccess,
+    isAdmin
 }: {
     product?: {
         stripeProduct: BasicProduct,
@@ -38,7 +22,8 @@ export function ProductDisplay({
         chapters: Chapter[],
         bonuses: { title: string, value: number }[]
     },
-    hasAccess: boolean
+    hasAccess?: boolean,
+    isAdmin?: boolean
 }) {
     const searchParams = useSearchParams();
     const currency = searchParams.get("currency") || "eur";
@@ -70,18 +55,27 @@ export function ProductDisplay({
             <div className="flex flex-col justify-between w-full p-4 flex-grow">
                 <header>
                     <div className="flex items-center gap-4">
-                        <h2 className="text-3xl font-light">
-                            {
-                                product ? (
-                                    product.stripeProduct.name
-                                ) : (
-                                    <Skeleton className="h-8 w-2/3 mb-2" />
-                                )
-                            }
-                        </h2>
+                        {
+                            product !== undefined ? (
+                                <h2 className="text-3xl font-light">
+                                    {product.stripeProduct.name}
+                                </h2>
+                            ) : (
+                                <Skeleton className="h-8 w-2/3 mb-2" />
+                            )
+                        }
                         {
                             hasAccess && (
                                 <Badge>Bought</Badge>
+                            )
+                        }
+                        {
+                            isAdmin && (
+                                <Link href={`/courses/${product?.stripeProduct.id}/edit`}>
+                                    <Button variant="outline" className="flex-end">
+                                        Edit
+                                    </Button>
+                                </Link>
                             )
                         }
                     </div>
@@ -102,7 +96,7 @@ export function ProductDisplay({
                                     <li key={chapter.id} className="mb-1">• {chapter.title}</li>
                                 ))
                             ) : (
-                                Array.from({ length: 7 }).map((_, index) => (
+                                Array.from({ length: 5 }).map((_, index) => (
                                     <li key={index} className="mb-1">
                                         <Skeleton className="h-4 w-full mb-2" />
                                     </li>
@@ -119,7 +113,7 @@ export function ProductDisplay({
                                         <li key={index} className="mb-1">{bonus.title} - value <span className="font-bold">{bonus.value}€</span></li>
                                     ))
                                 ) : (
-                                    Array.from({ length: 7 }).map((_, index) => (
+                                    Array.from({ length: 5 }).map((_, index) => (
                                         <li key={index} className="mb-1">
                                             <Skeleton className="h-4 w-full mb-2" />
                                         </li>

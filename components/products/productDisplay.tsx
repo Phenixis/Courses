@@ -33,8 +33,8 @@ export function ProductDisplay({
     const isChosenCurrency = priceToUse === priceInPrices;
 
     return (
-        <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
-            <figure className="w-1/5 mr-2 flex-shrink-0">
+        <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px] ">
+            <figure className="w-1/5 mr-2">
                 <AspectRatio ratio={21 / 29.7} className="w-full h-full">
                     {
                         product ? (

@@ -7,21 +7,11 @@ import { Chapter } from "@/lib/db/schema/chapter";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import type { BasicProduct } from "@/lib/payments/stripe";
+import { SubmitButton } from "./submitButton";
+import { ActionButton } from "./productButton";
+import { Badge } from "../ui/badge";
 
-function formatPrice(
-  amount: number,
-  currency: string
-): string {
-  if (currency.toLowerCase() === 'eur') {
-    return `${(amount / 100).toFixed(2)}€`;
-  } else if (currency.toLowerCase() === 'usd') {
-    return `$${(amount / 100).toFixed(2)}`;
-  } else {
-    return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
-  }
-}
-
-function SubmitButton({
+function SubmitButtonOld({
     title,
     skeleton = false
 }: {
@@ -42,8 +32,8 @@ export function ProductDisplay({
     product
 }: {
     product?: {
-    stripeProduct: BasicProduct,
-    prices: PersonalizedPrice[],
+        stripeProduct: BasicProduct,
+        prices: PersonalizedPrice[],
         chapters: Chapter[],
         bonuses: { title: string, value: number }[]
     }
@@ -53,6 +43,9 @@ export function ProductDisplay({
 
     const priceInPrices = product ? product.prices.find(price => price.currency.toLowerCase() === currency.toLowerCase()) : null;
     const priceToUse = priceInPrices || (product ? product.prices.find(price => price.id === product.stripeProduct.defaultPriceId) : null);
+    const isChosenCurrency = priceToUse === priceInPrices;
+
+    const hasAccess = false; // TODO: Replace with actual access check
 
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
@@ -76,13 +69,22 @@ export function ProductDisplay({
             </figure>
             <div className="flex flex-col justify-between w-full p-4 flex-grow">
                 <header>
-                    <h2 className="text-3xl font-light">{
-                        product ? (
-                            product.stripeProduct.name
-                        ) : (
-                            <Skeleton className="h-8 w-2/3 mb-2" />
-                        )}
-                    </h2>
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-3xl font-light">
+                            {
+                                product ? (
+                                    product.stripeProduct.name
+                                ) : (
+                                    <Skeleton className="h-8 w-2/3 mb-2" />
+                                )
+                            }
+                        </h2>
+                        {
+                            hasAccess && (
+                                <Badge>Bought</Badge>
+                            )
+                        }
+                    </div>
                     <h3 className="text-xl">
                         {product ? (
                             product.stripeProduct.description
@@ -128,23 +130,21 @@ export function ProductDisplay({
                     </article>
                 </section>
                 <footer className="flex justify-end">
-                    {product ? (
-                        priceToUse && typeof priceToUse.unit_amount === "number" ? (
-                            <form className="text-end" action={checkoutAction}>
-                                <input type="hidden" name="priceId" value={priceToUse.id} />
-                                <SubmitButton title={formatPrice(priceToUse.unit_amount, priceToUse.currency) + (priceInPrices != priceToUse ? "*" : "")} skeleton={false} />
-                                {
-                                    priceInPrices != priceToUse ? (
-                                        <p className="text-sm italic mb-1 text-gray-500 text-wrap">* In {priceToUse.currency.toUpperCase()}, no price found in {currency.toUpperCase()}</p>
-                                    ) : null
-                                }
-                            </form>
+                    {
+                        !product ? (
+                            <ActionButton
+                                skeleton
+                            />
                         ) : (
-                            <SubmitButton title="Free" />
+                            <ActionButton
+                                product_id={product.stripeProduct.id}
+                                price={priceToUse || undefined}
+                                isChosenCurrency={isChosenCurrency}
+                                hasAccess={hasAccess}
+                                skeleton={false}
+                            />
                         )
-                    ) : (
-                        <SubmitButton title="Loading..." skeleton />
-                    )}
+                    }
                 </footer>
             </div>
         </article >

@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
   }
 
   if (!eventListenedTo.find(e => e.eventName === event.type)) {
-    // console.log(`Event ${event.type} not listened to.`);
     return NextResponse.json({ received: true });
   }
 
@@ -48,16 +47,21 @@ export async function POST(request: NextRequest) {
         case 'session':
           switch (eventType[2]) {
             case 'async_payment_failed':
+              // Stripe Doc : Occurs when a payment intent using a delayed payment method fails.
               console.log("Event received:", event.type)
               break;
             case 'async_payment_succeeded':
+              // Stripe Doc : Occurs when a payment intent using a delayed payment method finally succeeds.
               console.log("Event received:", event.type)
               break;
             case 'completed':
+              // Stripe Doc : Occurs when a Checkout Session has been successfully completed.
               console.log("Event received:", event.type)
               break;
             case 'expired':
+              // Stripe Doc : Occurs when a Checkout Session is expired.
               console.log("Event received:", event.type)
+              console.log(event)
               break;
           }
           break;
@@ -69,26 +73,38 @@ export async function POST(request: NextRequest) {
           const subscription = event.data.object as Stripe.Subscription;
           switch (eventType[2]) {
             case 'created':
+              // Stripe Doc : Occurs whenever a customer is signed up for a new plan.
               console.log("Event received:", event.type)
               break;
+            case 'updated':
+              // Stripe Doc : Occurs whenever a subscription changes (e.g., switching from one plan to another, or changing the status from trial to active).
+              console.log("Event received:", event.type)
+              await handleSubscriptionChange(subscription);
+              break;
             case 'paused':
+              // Stripe Doc : Occurs whenever a customer's subscription is paused. Only applies when subscriptions enter status=paused, not when payment collection is paused.
               console.log("Event received:", event.type)
               await handleSubscriptionChange(subscription);
               break;
             case 'deleted':
-              console.log("Event received:", event.type)  
+              // Stripe Doc : Occurs whenever a customer's subscription ends.
+              console.log("Event received:", event.type)
               await handleSubscriptionChange(subscription);
               break;
             case 'resumed':
+              // Stripe Doc : Occurs whenever a customer's subscription is no longer paused. Only applies when a status=paused subscription is resumed, not when payment collection is resumed.
               console.log("Event received:", event.type)
               break;
             case 'trial_will_end':
+              // Stripe Doc : Occurs three days before a subscription's trial period is scheduled to end, or when a trial is ended immediately (using trial_end=now).
               console.log("Event received:", event.type)
               break;
             case 'pending_update_applied':
+              // Stripe Doc : Occurs whenever a customer's subscription's pending update is applied, and the subscription is updated.
               console.log("Event received:", event.type)
               break;
             case 'pending_update_expired':
+              // Stripe Doc : Occurs whenever a customer's subscription's pending update expires before the related invoice is paid.
               console.log("Event received:", event.type)
               break;
           }

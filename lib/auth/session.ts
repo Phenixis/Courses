@@ -51,8 +51,16 @@ export async function getSession(authMethod ?: Function | null) {
     return session;
   };
   let res = NextResponse.next();
+  let parsed: SessionData;
 
-  const parsed = await verifyToken(credentialsSession);
+  try {
+    parsed = await verifyToken(credentialsSession);
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    unsetSession();
+    return null;
+  }
+
   const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   res.cookies.set({
@@ -79,6 +87,17 @@ export async function setSession(user: NewUser) {
   const encryptedSession = await signToken(session);
   (await cookies()).set('session', encryptedSession, {
     expires: expiresInOneDay,
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+  });
+}
+
+export async function unsetSession() {
+  (await cookies()).set({
+    name: 'session',
+    value: '',
+    expires: new Date(0),
     httpOnly: true,
     secure: true,
     sameSite: 'lax',

@@ -135,7 +135,6 @@ export default function ProductDialog({
                     <div className="flex flex-col gap-2 w-full">
                         <div className="flex items-end gap-2 w-full">
                             <div className="flex flex-col-reverse gap-1 w-full">
-                                {/* Price input allows decimals, min 0, step 0.01 for cents */}
                                 <Input
                                     className="peer"
                                     type="number"

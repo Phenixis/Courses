@@ -20,9 +20,12 @@ export default function ProductsDisplay({
                 <CardContent className="grid grid-cols-3 gap-8">
                     {
                         products ?
-                        products.map(product => (
-                            <Product key={product.id} product={product} />
-                        )) : 
+                        // Sort products: active first, then inactive
+                        products
+                            .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
+                            .map(product => (
+                                <Product key={product.id} product={product} />
+                            )) :
                         Array.from({ length: 1 }).map((_, i) => (
                             <Product key={i} />
                         ))

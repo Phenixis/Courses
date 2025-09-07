@@ -181,11 +181,13 @@ async function createStripeWebhook(): Promise<string> {
 function generateAuthSecret(): Promise<string[]> {
   console.log('Step 5: Getting Authentification Secret');
 
+  // Generate a random authentication secret and prompt for Google credentials
+  // Equivalent shell command for generating the secret: `openssl rand -hex 32`
   return Promise.all([
     crypto.randomBytes(32).toString('hex'),
     question("Enter your Google ID: "),
     question("Enter your Google Secret: "),
-  ])
+  ]);
 }
 
 function getApplicationInfos(): Promise<string[]> {

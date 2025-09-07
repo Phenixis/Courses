@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
                     .where(eq(teamTable.id, teamId))
                     .limit(1);
             } else {
-                return { error: 'Invalid or expired invitation.' };
+                return NextResponse.redirect(process.env.BASE_URL + '/?error=invalid_invitation');
             }
         } else {
             // Create a new team if there's no invitation

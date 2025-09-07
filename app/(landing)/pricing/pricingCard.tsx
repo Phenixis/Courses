@@ -58,7 +58,7 @@ export default function PricingCard({
             <CardFooter>
                 <form action={checkoutAction} className="w-full">
                     <input type="hidden" name="priceId" value={priceId} />
-                    <SubmitButton />
+                    <SubmitButton title="Get Started" />
                 </form>
             </CardFooter>
         </Card>

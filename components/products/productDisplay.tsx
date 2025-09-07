@@ -3,10 +3,10 @@
 import { type PersonalizedPrice } from "@/lib/db/schema";
 import { checkoutAction } from "@/lib/payments/actions";
 import { AspectRatio } from "../ui/aspect-ratio";
-import Stripe from "stripe";
 import { Chapter } from "@/lib/db/schema/chapter";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
+import type { BasicProduct } from "@/lib/payments/stripe";
 
 function formatPrice(
   amount: number,
@@ -42,8 +42,8 @@ export function ProductDisplay({
     product
 }: {
     product?: {
-        stripeProduct: Stripe.Product,
-        prices: PersonalizedPrice[],
+    stripeProduct: BasicProduct,
+    prices: PersonalizedPrice[],
         chapters: Chapter[],
         bonuses: { title: string, value: number }[]
     }
@@ -52,7 +52,7 @@ export function ProductDisplay({
     const currency = searchParams.get("currency") || "eur";
 
     const priceInPrices = product ? product.prices.find(price => price.currency.toLowerCase() === currency.toLowerCase()) : null;
-    const priceToUse = priceInPrices || (product ? typeof product.stripeProduct.default_price === "string" ? product.prices.find(price => price.id === product.stripeProduct.default_price) : product.stripeProduct.default_price : null);
+    const priceToUse = priceInPrices || (product ? product.prices.find(price => price.id === product.stripeProduct.defaultPriceId) : null);
 
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
@@ -60,7 +60,7 @@ export function ProductDisplay({
                 <AspectRatio ratio={21 / 29.7} className="w-full h-full">
                     {
                         product ? (
-                            <img src={product.stripeProduct.images[0] || "/path/to/image.jpg"} alt="Product Image" className="w-full h-full border-2 rounded bg-slate-200" />
+                            <img src={product.stripeProduct.imageUrl || "/path/to/image.jpg"} alt="Product Image" className="w-full h-full border-2 rounded bg-slate-200" />
                         ) : (
                             <Skeleton className="w-full h-full border-2 rounded" />
                         )

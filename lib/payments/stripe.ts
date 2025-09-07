@@ -218,7 +218,17 @@ export async function getStripeProductById(id: string) {
     const product = await stripe.products.retrieve(id, {
       expand: ['default_price'],
     });
-    return product;
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      imageUrl: product.images[0] || null,
+      active: product.active,
+      defaultPriceId:
+        typeof product.default_price === 'string'
+          ? product.default_price
+          : product.default_price?.id,
+    } as BasicProduct;
   } catch (error) {
     console.error('Error retrieving product from Stripe:', error);
     return null;
@@ -232,6 +242,16 @@ export type StripeProductWithPrices = {
   active: boolean;
   defaultPriceId: string | undefined;
   prices: PersonalizedPrice[];
+};
+
+// Minimal, serializable product shape safe to pass to Client Components
+export type BasicProduct = {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  active: boolean;
+  defaultPriceId: string | undefined;
 };
 
 export async function getStripeProductsAndPrices() {

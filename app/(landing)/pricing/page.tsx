@@ -20,7 +20,7 @@ export default async function PricingPage() {
       <div className={`grid ${
         products.length > 2 ? 'md:grid-cols-3' : products.length > 1 ? 'md:grid-cols-2' : 'md:grid-cols-1'
       } gap-8 max-w-4xl mx-auto grid-cols-1`}>
-        {prices.sort((a, b) => (a.unitAmount || 0) - (b.unitAmount || 0)).map((price) => {
+  {prices.sort((a, b) => (a.unit_amount || 0) - (b.unit_amount || 0)).map((price) => {
           const product = products.find(
             (product) => product.id === price.productId
           );
@@ -33,10 +33,10 @@ export default async function PricingPage() {
             <PricingCard
               key={price.id}
               name={product.name}
-              price={price.unitAmount || 0}
+              price={price.unit_amount || 0}
               currency={price.currency}
-              interval={price.interval}
-              trialDays={price.trialPeriodDays}
+              interval={price.interval || 'one-time'}
+              trialDays={price.trialPeriodDays || 0}
               features={product.description?.split('\n') || []}
               priceId={price.id}
             />

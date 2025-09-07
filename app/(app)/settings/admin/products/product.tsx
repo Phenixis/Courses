@@ -73,8 +73,8 @@ export default function Product({
                                 <TableRow key={price.id}>
                                     <TableCell>
                                         {
-                                            price.unitAmount ? (
-                                                `${price.currency === 'usd' ? '$' : price.currency === 'gbp' ? '£' : ''}${(price.unitAmount / 100).toFixed(2)}${price.currency === 'eur' ? '€' : ''}`
+                                            price.unit_amount ? (
+                                                `${price.currency === 'usd' ? '$' : price.currency === 'gbp' ? '£' : ''}${(price.unit_amount / 100).toFixed(2)}${price.currency === 'eur' ? '€' : ''}`
                                             ) : "Free"
                                         }
                                     </TableCell>
@@ -99,7 +99,7 @@ export default function Product({
             <CardFooter className="flex justify-between">
                 {
                     product && (
-                        <ProductDialog productId={product.id} priceId={product.defaultPriceId} name={product.name} description={product.description} currency={product.prices[0].currency} price={product.prices[0].unitAmount || 0} interval={product.prices[0].interval} trial_period_days={product.prices[0].trialPeriodDays || 0} />
+                        <ProductDialog productId={product.id} priceId={product.defaultPriceId} name={product.name} description={product.description} currency={product.prices[0].currency} price={product.prices[0].unit_amount || 0} interval={product.prices[0].interval} trial_period_days={product.prices[0].trialPeriodDays || 0} />
                     )
                 }
 

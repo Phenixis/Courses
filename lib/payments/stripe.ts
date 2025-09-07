@@ -56,6 +56,10 @@ export async function createCheckoutSession({
     subscription_data: {
       trial_period_days: price.recurring?.trial_period_days || undefined,
     },
+    metadata: {
+      productId: typeof price.product === 'string' ? price.product : price.product?.id,
+      priceId: price.id,
+    }
   });
 
   redirect(session.url!);

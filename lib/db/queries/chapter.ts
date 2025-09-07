@@ -6,7 +6,7 @@ export async function getChaptersByProductId(stripeProductId: string, published?
     select()
     .from(chapterTable)
     .where(lib.eq(chapterTable.stripeProductId, stripeProductId))
-    .orderBy(lib.asc(chapterTable.numero));
+    .orderBy(lib.asc(chapterTable.numero)) as Chapter[];
 }
 
 export async function getChapterByProductIdAndNumero(stripeProductId: string, numero: number): Promise<Chapter | null> {

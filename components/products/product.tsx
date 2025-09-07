@@ -2,8 +2,9 @@ import { getStripeProductById } from "@/lib/payments/stripe";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
 import { checkoutAction } from "@/lib/payments/actions";
 import { AspectRatio } from "../ui/aspect-ratio";
+import { Chapter } from "@/lib/db/schema/chapter";
 
-export default async function Product({ stripeProductId }: { stripeProductId: string }) {
+export async function Product({ stripeProductId }: { stripeProductId: string }) {
     const product = await getStripeProductById(stripeProductId);
 
     if (!product) {
@@ -12,6 +13,18 @@ export default async function Product({ stripeProductId }: { stripeProductId: st
 
     const chapters = await getChaptersByProductId(stripeProductId);
 
+    return 
+}
+
+export async function ProductDisplay({
+    product
+}, {
+    product: {
+        stripeProduct: Stripe.Product,
+        chapters: Chapter[],
+        bonuses: string[]
+    }
+}) {
     return (
         <article className="shadow border rounded mb-4 p-4 flex items-stretch min-h-[200px]">
             <figure className="w-1/5 mr-2 flex-shrink-0">
@@ -29,7 +42,7 @@ export default async function Product({ stripeProductId }: { stripeProductId: st
                     <article>
                         <h4 className="font-semibold mb-2">What you'll learn</h4>
                         <ul>
-                            {chapters.map(chapter => (
+                            {product.chapters.map(chapter => (
                                 <li key={chapter.id} className="mb-1">• {chapter.title}</li>
                             ))}
                         </ul>

@@ -17,8 +17,8 @@
 - [ ] Add more Activity Logs
 - [ ] Add "type" to the feedback
 - [x] Personnalize the pricing page based on the active Stripe products
-- [ ] Add the privacy policy
-- [ ] Stylize the Terms of Service page
+- [x] Add the privacy policy
+- [x] Stylize the Terms of Service page
 - [ ] Personnalize the landing page to : ($100M Offers, Alez Hormozi)
     - Maximize the dream outcome (big claim/promise) and the perceived likelihood of achievement (show, prove, demonstrate)
     - Minimize the time delay (make it instant) and effort & sacrifice (make it easy)

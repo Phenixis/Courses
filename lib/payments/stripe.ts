@@ -46,7 +46,7 @@ export async function createCheckoutSession({
     
     if (hasAccess) {
       // User already has access to this product, redirect to courses page
-      redirect('/courses');
+      redirect(`/courses/${productId}`); // Adjust the URL as needed
     }
   }
   

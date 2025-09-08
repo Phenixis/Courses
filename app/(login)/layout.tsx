@@ -4,6 +4,8 @@ import Logo from '@/components/big/logo';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signIn as googleSignIn } from "next-auth/react"
+import { useValues } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 
 function getTitle() {
     const pathname = usePathname();
@@ -17,12 +19,19 @@ function getTitle() {
 }
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
+    const { user } = useValues();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const page = pathname.split('/').pop();
     const inviteId = searchParams.get('inviteId');
     const priceId = searchParams.get('priceId');
     const redirect = searchParams.get('redirect');
+
+    if (user) {
+        const router = useRouter();
+        return router.replace(redirect && redirect !== "checkout" ? redirect: '/');
+    }
+
 
     return (
         <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">

@@ -170,6 +170,18 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                 </div>
             )}
 
+            {/* Forgot password link - show when email is validated as existing user or in signin mode */}
+            {((mode === 'login' && emailValidated === 1) || mode === 'signin') && (
+                <div className="text-right">
+                    <Link
+                        href="/forgot-password"
+                        className="text-sm text-primary hover:text-primary/80 hover:underline"
+                    >
+                        Forgot your password?
+                    </Link>
+                </div>
+            )}
+
             {state?.error && (
                 <div className="text-red-500 text-sm">{state.error}</div>
             )}

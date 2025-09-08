@@ -8,8 +8,12 @@
 
 ## Roadmap/To-do
 
+### Login / Sign-Up
 - [ ] Add a forgot password flow
 - [ ] Add the ability to create a password for an account created with a Provider
+- [ ] When buying a product, then connecting to an account that already has the product, redirect to the product page.
+
+### Others
 - [ ] Add more Activity Logs
 - [ ] Add "type" to the feedback
 - [x] Personnalize the pricing page based on the active Stripe products

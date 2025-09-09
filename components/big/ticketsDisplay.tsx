@@ -2,6 +2,7 @@ import { Ticket } from "@/lib/db/schema";
 import { Badge } from "@/components/ui/badge";
 import { Check, Circle, Loader } from "lucide-react";
 import Link from "next/link";
+import { formatTicketStatus } from "@/lib/utils";
 
 export default async function TicketsDisplay({ admin, tickets }: { admin?: boolean, tickets?: Ticket[] }) {
 
@@ -18,9 +19,11 @@ export default async function TicketsDisplay({ admin, tickets }: { admin?: boole
                         </div>
                         <Badge variant="secondary" className="gap-1">
                             {
-                                ticket.status === 'open' ? (<Circle className="size-4" />) : ticket.status === 'closed' ? (<Check className="size-4" />) : (<Loader className="size-4" />)
+                                ticket.status === 'open' ? (<Circle className="size-4" />) : 
+                                ticket.status === 'closed' ? (<Check className="size-4" />) : 
+                                (<Loader className="size-4" />)
                             }
-                            {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                            {formatTicketStatus(ticket.status)}
                             </Badge>
                     </Link>
                 ))

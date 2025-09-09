@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import CommentForm from '@/components/ticket/CommentForm';
 import AdminControls from '@/components/ticket/AdminControls';
+import { formatTicketStatus } from '@/lib/utils';
 
 export default async function Page({
     params
@@ -44,7 +45,7 @@ export default async function Page({
                 <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100">
                     <span className="text-gray-300 dark:text-gray-700">#{ticket.id}</span> {ticket.title}
                 </h1>
-                <Badge variant="outline">{ticket.status}</Badge>
+                <Badge variant="outline">{formatTicketStatus(ticket.status)}</Badge>
             </div>
             <Card>
                 <CardHeader>

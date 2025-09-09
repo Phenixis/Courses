@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Filter, ArrowUpDown } from 'lucide-react';
 import { TicketStatus } from '@/lib/db/schema';
+import { formatTicketStatus } from '@/lib/utils';
 
 interface TicketFiltersProps {
     onFilterChange: (filters: {
@@ -69,10 +70,10 @@ export default function TicketFilters({ onFilterChange, currentFilters }: Ticket
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All</SelectItem>
-                                <SelectItem value={TicketStatus.OPEN}>Open</SelectItem>
-                                <SelectItem value={TicketStatus.REVIEWING}>Reviewing</SelectItem>
-                                <SelectItem value={TicketStatus.IN_PROGRESS}>In Progress</SelectItem>
-                                <SelectItem value={TicketStatus.CLOSED}>Closed</SelectItem>
+                                <SelectItem value={TicketStatus.OPEN}>{formatTicketStatus(TicketStatus.OPEN)}</SelectItem>
+                                <SelectItem value={TicketStatus.REVIEWING}>{formatTicketStatus(TicketStatus.REVIEWING)}</SelectItem>
+                                <SelectItem value={TicketStatus.IN_PROGRESS}>{formatTicketStatus(TicketStatus.IN_PROGRESS)}</SelectItem>
+                                <SelectItem value={TicketStatus.CLOSED}>{formatTicketStatus(TicketStatus.CLOSED)}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

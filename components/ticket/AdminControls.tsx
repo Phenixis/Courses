@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertTriangle, Settings } from 'lucide-react';
 import { updateTicketStatus } from '@/components/feedback/actions';
 import { TicketStatus } from '@/lib/db/schema';
+import { formatTicketStatus } from '@/lib/utils';
 
 type ActionState = {
     error?: string;
@@ -71,7 +72,7 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">Current Status:</span>
-                            <Badge variant="outline">{currentStatus}</Badge>
+                            <Badge variant="outline">{formatTicketStatus(currentStatus)}</Badge>
                         </div>
                     </div>
 
@@ -86,10 +87,10 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value={TicketStatus.OPEN}>Open</SelectItem>
-                                <SelectItem value={TicketStatus.REVIEWING}>Reviewing</SelectItem>
-                                <SelectItem value={TicketStatus.IN_PROGRESS}>In Progress</SelectItem>
-                                <SelectItem value={TicketStatus.CLOSED}>Closed</SelectItem>
+                                <SelectItem value={TicketStatus.OPEN}>{formatTicketStatus(TicketStatus.OPEN)}</SelectItem>
+                                <SelectItem value={TicketStatus.REVIEWING}>{formatTicketStatus(TicketStatus.REVIEWING)}</SelectItem>
+                                <SelectItem value={TicketStatus.IN_PROGRESS}>{formatTicketStatus(TicketStatus.IN_PROGRESS)}</SelectItem>
+                                <SelectItem value={TicketStatus.CLOSED}>{formatTicketStatus(TicketStatus.CLOSED)}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

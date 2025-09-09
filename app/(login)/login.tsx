@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { signIn, signUp, validateEmail } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
+import { validatePasswordStrength } from '@/lib/utils';
 
 // Only keep the correct Login function implementation below
 export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login' }) {
@@ -21,6 +22,23 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
     const [emailValidated, setEmailValidated] = useState(0); // 0: not validated, 1: existing, 2: new, -1: provider error
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+    
+    // Password validation state
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+    const [showPasswordErrors, setShowPasswordErrors] = useState(false);
+
+    const handlePasswordChange = (value: string) => {
+        setPassword(value);
+        const validation = validatePasswordStrength(value);
+        setPasswordErrors(validation.errors);
+        setShowPasswordErrors(value.length > 0 && !validation.isValid);
+    };
+
+    const handleConfirmPasswordChange = (value: string) => {
+        setConfirmPassword(value);
+    };
 
     // Select action based on mode
     const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -152,10 +170,22 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                             required={emailValidated > 0}
                             minLength={8}
                             maxLength={100}
+                            value={password}
+                            onChange={(e) => handlePasswordChange(e.target.value)}
                             className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                             placeholder="Enter your password"
                         />
                     </div>
+                    {/* Password strength feedback for new users in login mode */}
+                    {emailValidated === 2 && showPasswordErrors && (
+                        <div className="mt-1 text-sm text-red-600">
+                            <ul className="list-disc list-inside space-y-1">
+                                {passwordErrors.map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div>
@@ -189,10 +219,84 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                             required
                             minLength={8}
                             maxLength={100}
+                            value={mode === 'signin' ? undefined : password}
+                            onChange={mode === 'signin' ? undefined : (e) => handlePasswordChange(e.target.value)}
                             className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                             placeholder="Enter your password"
                         />
                     </div>
+                    {/* Password strength feedback for signup mode */}
+                    {mode === 'signup' && showPasswordErrors && (
+                        <div className="mt-1 text-sm text-red-600">
+                            <ul className="list-disc list-inside space-y-1">
+                                {passwordErrors.map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Password confirmation field for login mode when creating new account */}
+            {mode === 'login' && emailValidated === 2 && (
+                <div>
+                    <Label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Confirm Password
+                    </Label>
+                    <div className="mt-1">
+                        <Input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            autoComplete="new-password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                            placeholder="Confirm your password"
+                        />
+                    </div>
+                    {/* Password match validation */}
+                    {confirmPassword.length > 0 && password !== confirmPassword && (
+                        <div className="mt-1 text-sm text-red-600">
+                            Passwords don't match
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Password confirmation field for signup mode */}
+            {mode === 'signup' && (
+                <div>
+                    <Label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Confirm Password
+                    </Label>
+                    <div className="mt-1">
+                        <Input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            autoComplete="new-password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                            placeholder="Confirm your password"
+                        />
+                    </div>
+                    {/* Password match validation */}
+                    {confirmPassword.length > 0 && password !== confirmPassword && (
+                        <div className="mt-1 text-sm text-red-600">
+                            Passwords don't match
+                        </div>
+                    )}
                 </div>
             )}
 

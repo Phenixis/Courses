@@ -26,14 +26,18 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
     // Password validation state
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
-    const [showPasswordErrors, setShowPasswordErrors] = useState(false);
+    const [passwordValidation, setPasswordValidation] = useState<{
+        isValid: boolean;
+        errors: string[];
+        requirements: Array<{ text: string; met: boolean }>;
+    }>({ isValid: false, errors: [], requirements: [] });
+    const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
     const handlePasswordChange = (value: string) => {
         setPassword(value);
         const validation = validatePasswordStrength(value);
-        setPasswordErrors(validation.errors);
-        setShowPasswordErrors(value.length > 0 && !validation.isValid);
+        setPasswordValidation(validation);
+        setShowPasswordRequirements(value.length > 0);
     };
 
     const handleConfirmPasswordChange = (value: string) => {
@@ -177,11 +181,16 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                         />
                     </div>
                     {/* Password strength feedback for new users in login mode */}
-                    {emailValidated === 2 && showPasswordErrors && (
-                        <div className="mt-1 text-sm text-red-600">
-                            <ul className="list-disc list-inside space-y-1">
-                                {passwordErrors.map((error, index) => (
-                                    <li key={index}>{error}</li>
+                    {emailValidated === 2 && showPasswordRequirements && (
+                        <div className="mt-1 text-sm">
+                            <ul className="list-none space-y-1">
+                                {passwordValidation.requirements.map((requirement, index) => (
+                                    <li key={index} className={`flex items-center space-x-2 ${
+                                        requirement.met ? 'text-green-600' : 'text-red-600'
+                                    }`}>
+                                        <span>{requirement.met ? '✓' : '✗'}</span>
+                                        <span>{requirement.text}</span>
+                                    </li>
                                 ))}
                             </ul>
                         </div>
@@ -226,11 +235,16 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                         />
                     </div>
                     {/* Password strength feedback for signup mode */}
-                    {mode === 'signup' && showPasswordErrors && (
-                        <div className="mt-1 text-sm text-red-600">
-                            <ul className="list-disc list-inside space-y-1">
-                                {passwordErrors.map((error, index) => (
-                                    <li key={index}>{error}</li>
+                    {mode === 'signup' && showPasswordRequirements && (
+                        <div className="mt-1 text-sm">
+                            <ul className="list-none space-y-1">
+                                {passwordValidation.requirements.map((requirement, index) => (
+                                    <li key={index} className={`flex items-center space-x-2 ${
+                                        requirement.met ? 'text-green-600' : 'text-red-600'
+                                    }`}>
+                                        <span>{requirement.met ? '✓' : '✗'}</span>
+                                        <span>{requirement.text}</span>
+                                    </li>
                                 ))}
                             </ul>
                         </div>

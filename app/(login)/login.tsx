@@ -122,12 +122,25 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
             {/* Password field logic for 'login' mode */}
             {mode === 'login' ? (
                 <div className={`${emailValidated > 0 ? 'block' : 'hidden'}`}>
-                    <Label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Password
-                    </Label>
+                    <div className="flex items-center justify-between">
+                        <Label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Password
+                        </Label>
+                        {/* Forgot password link - show when email is validated as existing user or in signin mode */}
+                        {(mode === 'login' && emailValidated === 1) && (
+                            <div className="text-right">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-sm text-primary hover:text-primary/80 hover:underline"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                     <div className="mt-1">
                         <Input
                             id="password"
@@ -146,12 +159,25 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                 </div>
             ) : (
                 <div>
-                    <Label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Password
-                    </Label>
+                    <div className="flex items-center justify-between">
+                        <Label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Password
+                        </Label>
+                        {/* Forgot password link - show when email is validated as existing user or in signin mode */}
+                        {(mode === 'signin') && (
+                            <div className="text-right">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-sm text-primary hover:text-primary/80 hover:underline"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                     <div className="mt-1">
                         <Input
                             id="password"
@@ -167,18 +193,6 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                             placeholder="Enter your password"
                         />
                     </div>
-                </div>
-            )}
-
-            {/* Forgot password link - show when email is validated as existing user or in signin mode */}
-            {((mode === 'login' && emailValidated === 1) || mode === 'signin') && (
-                <div className="text-right">
-                    <Link
-                        href="/forgot-password"
-                        className="text-sm text-primary hover:text-primary/80 hover:underline"
-                    >
-                        Forgot your password?
-                    </Link>
                 </div>
             )}
 

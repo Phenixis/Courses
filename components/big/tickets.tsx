@@ -1,6 +1,6 @@
 import { getFeedbacks, getAllFeedbacks } from "@/components/feedback/actions";
 import { getUser } from "@/lib/db/queries";
-import TicketsDisplay from "./ticketsDisplay";
+import TicketsWithFilters from "./ticketsWithFilters";
 
 export default async function Tickets({
     admin
@@ -12,9 +12,12 @@ export default async function Tickets({
         return <div>User not found</div>;
     }
 
-    const feedbacks = admin ? await getAllFeedbacks() : await getFeedbacks(user?.id || '', user?.email || '');
+    const initialTickets = admin ? await getAllFeedbacks() : await getFeedbacks(user?.id || '', user?.email || '');
 
     return (
-        <TicketsDisplay admin={admin} tickets={feedbacks} />
+        <TicketsWithFilters
+            initialTickets={initialTickets}
+            admin={admin}
+        />
     )
 }

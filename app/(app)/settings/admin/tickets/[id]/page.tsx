@@ -4,6 +4,8 @@ import { getUser } from "@/lib/db/queries";
 import { redirect } from "next/navigation";
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import CommentForm from '@/components/ticket/CommentForm';
+import AdminControls from '@/components/ticket/AdminControls';
 
 export default async function Page({
     params
@@ -21,11 +23,20 @@ export default async function Page({
     }
 
     if ((ticket.openedBy !== user.id && ticket.openerEmail !== user.email) && user.role !== 'admin') {
-        redirect('/settings/ticket');
+        redirect('/settings/tickets');
     }
 
-    // TODO: add the option to reply to a ticket
-    // TODO: add the option to change the status of a ticket
+    // Get user name for the ticket opener
+    let ticketOpenerName = 'Guest';
+    if (ticket.openedBy) {
+        const ticketOpener = await getUser(ticket.openedBy);
+        ticketOpenerName = ticketOpener?.name || 'Unknown User';
+    }
+
+    // Get comment users in parallel
+    const commentUsers = await Promise.all(
+        comments.map(comment => getUser(comment.userId))
+    );
 
     return (
         <section className="flex-1 p-4 lg:p-8">
@@ -37,7 +48,7 @@ export default async function Page({
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>{user.name} wrote {creationTime} :</CardTitle>
+                    <CardTitle>{ticketOpenerName} wrote {creationTime}:</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p>
@@ -46,24 +57,33 @@ export default async function Page({
                 </CardContent>
             </Card>
             {
-                comments.map((comment, index) => (
-                    <div key={index}>
-                        <hr className="ml-4 my-6 w-12 rotate-90" />
-                        <Card key={comment.id} className="mt-4">
-                            <CardHeader>
-                                <CardTitle>{
-                                getUser(comment.userId).then((user) => user?.name)
-                                } wrote {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })} :</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p>
-                                    {comment.comment}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                ))
+                comments.map((comment, index) => {
+                    const commentUser = commentUsers[index];
+                    const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+                    
+                    return (
+                        <div key={comment.id}>
+                            <hr className="ml-4 my-6 w-12 rotate-90" />
+                            <Card className="mt-4">
+                                <CardHeader>
+                                    <CardTitle>{commentUser?.name || 'Unknown User'} wrote {commentTime}:</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p>
+                                        {comment.comment}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    );
+                })
             }
+            
+            <CommentForm ticketId={parseInt(id)} userId={user.id} />
+            
+            {user.role === 'admin' && (
+                <AdminControls ticketId={parseInt(id)} currentStatus={ticket.status} />
+            )}
         </section>
     )
 }

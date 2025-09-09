@@ -449,3 +449,122 @@ export const validateEmail = async (email: string) => {
 
   return emailValidationResult.KNOWN;
 }
+
+// Forgot Password Actions
+const forgotPasswordSchema = z.object({
+  email: z.string().email().min(3).max(255),
+});
+
+export const forgotPassword = validatedAction(forgotPasswordSchema, async (data) => {
+  const { email } = data;
+
+  // Check if user exists and has a password (not provider-only account)
+  const user = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.email, email))
+    .limit(1);
+
+  if (user.length === 0) {
+    // Don't reveal if email exists or not for security
+    return { success: 'If an account with that email exists, we have sent you a password reset link.' };
+  }
+
+  const foundUser = user[0];
+
+  if (!foundUser.passwordHash) {
+    // User signed up with a provider
+    return { error: 'This account uses a provider sign-in. Please sign in with your provider.' };
+  }
+
+  // Import password reset session functions
+  const { createPasswordResetSession, deletePasswordResetSessionsForUser } = await import('@/lib/db/queries/password-reset-session');
+  const { sendEmail } = await import('@/components/email/send_email');
+
+  // Clean up any existing reset sessions for this user
+  await deletePasswordResetSessionsForUser(foundUser.id);
+
+  // Create new reset session (expires in 1 hour)
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1);
+
+  const resetSession = await createPasswordResetSession({
+    userId: foundUser.id,
+    email: foundUser.email,
+    expiresAt,
+  });
+
+  // Send reset email
+  const resetUrl = `${process.env.BASE_URL}/forgot-password?session-id=${resetSession.sessionId}`;
+  const emailContent = `
+    <h2>Password Reset Request</h2>
+    <p>You have requested to reset your password. Click the link below to reset your password:</p>
+    <p><a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+    <p>This link will expire in 1 hour.</p>
+    <p>If you did not request this password reset, please ignore this email.</p>
+  `;
+
+  try {
+    await sendEmail(email, 'Password Reset Request', emailContent);
+    return { success: 'If an account with that email exists, we have sent you a password reset link.' };
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return { error: 'Failed to send password reset email. Please try again.' };
+  }
+});
+
+const resetPasswordSchema = z
+  .object({
+    sessionId: z.string().min(1),
+    password: z.string().min(8).max(100),
+    confirmPassword: z.string().min(8).max(100),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+export const resetPassword = validatedAction(resetPasswordSchema, async (data) => {
+  const { sessionId, password } = data;
+
+  // Import password reset session functions
+  const { getPasswordResetSession, markPasswordResetSessionAsUsed } = await import('@/lib/db/queries/password-reset-session');
+
+  // Validate session
+  const resetSession = await getPasswordResetSession(sessionId);
+
+  if (!resetSession) {
+    return { error: 'Invalid or expired reset link. Please request a new password reset.' };
+  }
+
+  // Get user and update password
+  const user = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.id, resetSession.userId))
+    .limit(1);
+
+  if (user.length === 0) {
+    return { error: 'User not found.' };
+  }
+
+  const foundUser = user[0];
+
+  // Hash new password
+  const newPasswordHash = await hashPassword(password);
+
+  // Update password and mark session as used
+  await Promise.all([
+    db
+      .update(userTable)
+      .set({ passwordHash: newPasswordHash })
+      .where(eq(userTable.id, foundUser.id)),
+    markPasswordResetSessionAsUsed(sessionId),
+  ]);
+
+  // Log activity
+  const userWithTeam = await getUserWithTeam(foundUser.id);
+  await logActivity(userWithTeam?.teamId, foundUser.id, ActivityType.UPDATE_PASSWORD);
+
+  return { success: 'Password reset successfully. You can now sign in with your new password.' };
+});

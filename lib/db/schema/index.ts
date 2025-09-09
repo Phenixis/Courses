@@ -19,6 +19,7 @@ export * from "./team"
 /* Single user table and session management // Required for authentication */
 export * from "./user"
 export * from "./session"
+export * from "./password-reset-session"
 
 /* Tickets reporting */
 export * from "./ticket-comment"

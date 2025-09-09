@@ -8,6 +8,8 @@ export {
     isNotNull, 
     count,
     not,
-    sql
+    sql,
+    gt,
+    lt
 } from 'drizzle-orm';
 export { db } from '../drizzle';

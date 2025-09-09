@@ -23,10 +23,23 @@ import {
   validatedAction,
   validatedActionWithUser,
 } from '@/lib/auth/middleware';
+import { validatePasswordStrength } from '@/lib/utils';
+
+// Custom password validation schema
+const passwordSchema = z.string()
+    .min(8, "Password must be at least 8 characters long")
+    .max(100, "Password must be at most 100 characters long")
+    .refine((password) => {
+        const validation = validatePasswordStrength(password);
+        return validation.isValid;
+    }, (password) => {
+        const validation = validatePasswordStrength(password);
+        return { message: validation.errors.join(', ') };
+    });
 
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
-  password: z.string().min(8).max(100),
+  password: passwordSchema,
 });
 
 export const signIn = validatedAction(signInSchema, async (data, formData) => {
@@ -78,8 +91,12 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
 const signUpSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: passwordSchema,
+  confirmPassword: z.string(),
   inviteId: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
 });
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
@@ -200,8 +217,8 @@ export async function signOut() {
 const updatePasswordSchema = z
   .object({
     currentPassword: z.string().min(8).max(100),
-    newPassword: z.string().min(8).max(100),
-    confirmPassword: z.string().min(8).max(100),
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",
@@ -516,8 +533,8 @@ export const forgotPassword = validatedAction(forgotPasswordSchema, async (data)
 const resetPasswordSchema = z
   .object({
     sessionId: z.string().min(1),
-    password: z.string().min(8).max(100),
-    confirmPassword: z.string().min(8).max(100),
+    password: passwordSchema,
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

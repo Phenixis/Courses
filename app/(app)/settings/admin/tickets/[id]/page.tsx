@@ -29,9 +29,11 @@ export default async function Page({
 
     // Get user name for the ticket opener
     let ticketOpenerName = 'Guest';
+    let ticketOpenerIsAdmin = false;
     if (ticket.openedBy) {
         const ticketOpener = await getUser(ticket.openedBy);
         ticketOpenerName = ticketOpener?.name || 'Unknown User';
+        ticketOpenerIsAdmin = ticketOpener?.role === 'admin';
     }
 
     // Get comment users in parallel
@@ -49,7 +51,14 @@ export default async function Page({
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>{ticketOpenerName} wrote {creationTime}:</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <span>{ticketOpenerName} wrote {creationTime}:</span>
+                        {ticketOpenerIsAdmin && (
+                            <Badge variant="secondary" className="text-xs">
+                                Admin
+                            </Badge>
+                        )}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p>
@@ -61,13 +70,21 @@ export default async function Page({
                 comments.map((comment, index) => {
                     const commentUser = commentUsers[index];
                     const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+                    const isAdmin = commentUser?.role === 'admin';
                     
                     return (
                         <div key={comment.id}>
                             <hr className="ml-4 my-6 w-12 rotate-90" />
                             <Card className="mt-4">
                                 <CardHeader>
-                                    <CardTitle>{commentUser?.name || 'Unknown User'} wrote {commentTime}:</CardTitle>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <span>{commentUser?.name || 'Unknown User'} wrote {commentTime}:</span>
+                                        {isAdmin && (
+                                            <Badge variant="secondary" className="text-xs">
+                                                Admin
+                                            </Badge>
+                                        )}
+                                    </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p>

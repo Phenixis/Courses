@@ -4,12 +4,13 @@ import { getUser } from "@/lib/db/queries";
 import { getAccessByUserId } from "@/lib/db/queries/access";
 import { getStripeProducts } from "@/lib/payments/stripe";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 export default async function CoursesPage() {
     const user = await getUser();
 
     if (!user) {
-        return <div>Please log in to view your courses.</div>;
+        return redirect('/login?redirect=courses');
     }
 
     const products = await getStripeProducts(true);

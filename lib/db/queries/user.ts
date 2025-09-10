@@ -18,7 +18,7 @@ export async function getUser(id?: string) {
       .select()
       .from(userTable)
       .where(lib.and(
-        (session.user.id ? lib.eq(userTable.id, session.user?.id) : lib.eq(userTable.email, session.user?.email)),
+        lib.eq(userTable.id, session.user?.id),
         lib.isNull(userTable.deletedAt))
       )
       .limit(1);

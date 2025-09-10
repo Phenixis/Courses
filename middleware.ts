@@ -5,7 +5,7 @@ import NextAuth from 'next-auth';
 import authConfig from './auth.config';
 
 const protectedRoutes = ['/dashboard', '/settings', '/courses'];
-const unaccessibleWhenConnected = ['/sign-in', '/sign-up'];
+const unaccessibleWhenConnected = ['/sign-in', '/sign-up', '/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,11 +14,11 @@ export async function middleware(request: NextRequest) {
   const session = await getSession(auth);
   const isProtectedRoute = protectedRoutes.includes(pathname);
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && session === null) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
-  if (session && unaccessibleWhenConnected.includes(pathname)) {
+  if (session !== null && unaccessibleWhenConnected.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 }

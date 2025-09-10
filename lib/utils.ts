@@ -2,23 +2,25 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+    return twMerge(clsx(inputs));
 }
 
 export function formatTicketStatus(status: string): string {
-  return status.replace('_', ' ').split(' ').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
-  
-/**
- * Validates password strength according to security requirements:
- * - At least one uppercase letter
- * - At least one lowercase letter  
- * - At least one special character
- * - Minimum 8 characters
- */
-export function validatePasswordStrength(password: string): { 
-    isValid: boolean; 
+    return status.replace('_', ' ').split(' ').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+
+    /**
+     * Validates password strength according to security requirements:
+     * - At least one uppercase letter
+     * - At least one lowercase letter  
+     * - At least one special character
+     * - Minimum 8 characters
+     */
+}
+
+export function validatePasswordStrength(password: string): {
+    isValid: boolean;
     errors: string[];
     requirements: Array<{
         text: string;
@@ -26,12 +28,12 @@ export function validatePasswordStrength(password: string): {
     }>;
 } {
     const errors: string[] = [];
-    
+
     const lengthRequirement = password.length >= 8;
     const uppercaseRequirement = /[A-Z]/.test(password);
     const lowercaseRequirement = /[a-z]/.test(password);
     const specialCharRequirement = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-    
+
     const requirements = [
         {
             text: 'At least 8 characters long',
@@ -50,24 +52,24 @@ export function validatePasswordStrength(password: string): {
             met: specialCharRequirement
         }
     ];
-    
+
     // Keep the existing error format for backward compatibility
     if (!lengthRequirement) {
         errors.push('Password must be at least 8 characters long');
     }
-    
+
     if (!uppercaseRequirement) {
         errors.push('Password must contain at least one uppercase letter');
     }
-    
+
     if (!lowercaseRequirement) {
         errors.push('Password must contain at least one lowercase letter');
     }
-    
+
     if (!specialCharRequirement) {
         errors.push('Password must contain at least one special character');
     }
-    
+
     return {
         isValid: errors.length === 0,
         errors,

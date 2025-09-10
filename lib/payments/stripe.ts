@@ -32,24 +32,23 @@ export async function createCheckoutSession({
   }
 
   const team = await getTeamForUser(user.id);
-  
+
   if (!team) {
     redirect(redirectIfError);
   }
-  
+
   // Check if user already has access to this product to avoid duplicate purchases
   const productId = typeof price.product === 'string' ? price.product : price.product?.id;
-  
+
   if (productId) {
     const userAccess = await getAccessByUserId(user.id);
     const hasAccess = userAccess.some(access => access.stripeProductId === productId);
-    
+
     if (hasAccess) {
-      // User already has access to this product, redirect to courses page
+      // User already has access to this product, redirect to course page
       redirect(`/courses/${productId}`); // Adjust the URL as needed
     }
   }
-  
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -71,7 +70,7 @@ export async function createCheckoutSession({
       trial_period_days: price.recurring?.trial_period_days || undefined,
     },
     metadata: {
-      productId: typeof price.product === 'string' ? price.product : price.product?.id,
+      productId: productId,
       priceId: price.id,
     }
   });
@@ -237,6 +236,7 @@ export async function getStripeProductById(id: string) {
     const product = await stripe.products.retrieve(id, {
       expand: ['default_price'],
     });
+    
     return {
       id: product.id,
       name: product.name,

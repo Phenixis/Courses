@@ -1,11 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
-import { userTable, teamTable, teamMemberTable } from '@/lib/db/schema';
+import { userTable, teamTable, teamMemberTable, ActivityType } from '@/lib/db/schema';
 import { setSession } from '@/lib/auth/session';
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/payments/stripe';
 import Stripe from 'stripe';
 import { createAccess } from '@/lib/db/queries/access';
+import { logActivity } from '@/lib/db/queries';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -126,6 +127,8 @@ export async function GET(request: NextRequest) {
           stripePriceId: priceIdFromMetadata,
           paymentIntentId: paymentIntentId,
         });
+
+        await logActivity(userTeam[0].teamId, user[0].id, ActivityType.PRODUCT_BOUGHT);
 
         if (!result) {
           throw new Error('Failed to create access record.');

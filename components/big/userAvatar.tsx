@@ -39,7 +39,7 @@ export default function UserAvatar({
 
         <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DropdownMenuTrigger asChild>
-                <div className={`flex space-x-2 items-center p-2 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800`}>
+                <div className={`flex space-x-2 items-center p-2 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700`}>
                     <Avatar className="cursor-pointer size-6 lg:size-8">
                         <AvatarImage src={user.image || ''} alt={user.name || ''} />
                         <AvatarFallback>

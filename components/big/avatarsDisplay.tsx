@@ -9,7 +9,7 @@ export default function AvatarsDisplay({ images, numberUsers }: { images?: { nam
                 {
                     skeleton ?
                         Array(5).fill(null).map((_, i) => (
-                            <div key={i} className="size-12 bg-gray-200 rounded-full border border-black"></div>
+                            <div key={i} className="size-12 bg-gray-200 dark:bg-gray-700 rounded-full border border-black dark:border-gray-400"></div>
                         ))
                         :
                         images?.map((image, i) => (

@@ -38,7 +38,7 @@ export function ProductDisplay({
                 <AspectRatio ratio={21 / 29.7} className="w-full h-full">
                     {
                         product ? (
-                            <img src={product.stripeProduct.imageUrl || "/path/to/image.jpg"} alt="Product Image" className="w-full h-full border-2 rounded bg-slate-200" />
+                            <img src={product.stripeProduct.imageUrl || "/path/to/image.jpg"} alt="Product Image" className="w-full h-full border-2 rounded bg-slate-200 dark:bg-slate-700" />
                         ) : (
                             <Skeleton className="w-full h-full border-2 rounded" />
                         )

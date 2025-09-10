@@ -16,7 +16,11 @@ const eventListenedTo = [
   { eventName: 'customer.subscription.pending_update_expired' },
   { eventName: 'customer.subscription.resumed' },
   { eventName: 'customer.subscription.trial_will_end' },
-  { eventName: 'customer.subscription.updated' }
+  { eventName: 'customer.subscription.updated' },
+  { eventName: 'charge.refunded' },
+  { eventName: 'refund.created' },
+  { eventName: 'refund.failed' },
+  { eventName: 'refund.updated' },
 ]
 
 export async function POST(request: NextRequest) {
@@ -42,6 +46,14 @@ export async function POST(request: NextRequest) {
   const eventType = event.type.split('.');
 
   switch (eventType[0]) {
+    case 'charge':
+      switch (eventType[1]) {
+        case 'refunded':
+          // Stripe Doc : Occurs whenever a charge is refunded, including partial refunds.
+          console.log("Event received:", event.type)
+          break;
+      }
+      break;
     case 'checkout':
       switch (eventType[1]) {
         case 'session':
@@ -111,6 +123,21 @@ export async function POST(request: NextRequest) {
           break;
       }
       break;
+    case 'refund':
+      switch (eventType[1]) {
+        case 'created':
+          // Stripe Doc : Occurs whenever a refund is created.
+          console.log("Event received:", event.type)
+          break;
+        case 'failed':
+          // Stripe Doc : Occurs whenever a refund fails.
+          console.log("Event received:", event.type)
+          break;
+        case 'updated':
+          // Stripe Doc : Occurs whenever a refund is updated.
+          console.log("Event received:", event.type)
+          break;
+      }
   }
 
   // switch (event.type) {

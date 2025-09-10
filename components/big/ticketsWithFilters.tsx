@@ -65,10 +65,7 @@ export default function TicketsWithFilters({
 
     return (
         <div>
-            <TicketFilters
-                onFilterChange={handleFilterChange}
-                currentFilters={filters}
-            />
+            <TicketFilters />
             <TicketsDisplay 
                 admin={admin} 
                 tickets={tickets} 

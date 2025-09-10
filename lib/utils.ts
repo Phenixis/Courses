@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function formatTicketStatus(status: string): string {
+  return status.replace('_', ' ').split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+  
 /**
  * Validates password strength according to security requirements:
  * - At least one uppercase letter

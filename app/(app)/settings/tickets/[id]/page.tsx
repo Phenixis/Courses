@@ -4,6 +4,8 @@ import { getUser } from "@/lib/db/queries";
 import { redirect } from "next/navigation";
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import CommentForm from '@/components/ticket/CommentForm';
+import { formatTicketStatus } from '@/lib/utils';
 
 export default async function Page({
     params
@@ -21,11 +23,17 @@ export default async function Page({
     }
 
     if ((ticket.openedBy !== user.id && ticket.openerEmail !== user.email)) {
-        redirect('/settings/ticket');
+        redirect('/settings/tickets');
     }
 
-    // TODO: add the option to reply to a ticket
-    // TODO: add the option to change the status of a ticket
+    // Get user name for the ticket opener
+    const ticketOpenerName = ticket.openedBy === user.id ? user.name : 'Guest';
+    const ticketOpenerIsAdmin = ticket.openedBy === user.id && user.role === 'admin';
+
+    // Get comment users in parallel
+    const commentUsers = await Promise.all(
+        comments.map(comment => getUser(comment.userId))
+    );
 
     return (
         <section className="flex-1 p-4 lg:p-8">
@@ -33,11 +41,18 @@ export default async function Page({
                 <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100">
                     <span className="text-gray-300 dark:text-gray-700">#{ticket.id}</span> {ticket.title}
                 </h1>
-                <Badge variant="outline">{ticket.status}</Badge>
+                <Badge variant="outline">{formatTicketStatus(ticket.status)}</Badge>
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>{user.name} wrote {creationTime} :</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <span>{ticketOpenerName} wrote {creationTime}:</span>
+                        {ticketOpenerIsAdmin && (
+                            <Badge variant="secondary" className="text-xs">
+                                Admin
+                            </Badge>
+                        )}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p>
@@ -46,24 +61,37 @@ export default async function Page({
                 </CardContent>
             </Card>
             {
-                comments.map((comment, index) => (
-                    <div key={index}>
-                        <hr className="ml-4 my-6 w-12 rotate-90" />
-                        <Card key={comment.id} className="mt-4">
-                            <CardHeader>
-                                <CardTitle>{
-                                getUser(comment.userId).then((user) => user?.name)
-                                } wrote {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })} :</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p>
-                                    {comment.comment}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                ))
+                comments.map((comment, index) => {
+                    const commentUser = commentUsers[index];
+                    const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+                    const isAdmin = commentUser?.role === 'admin';
+                    
+                    return (
+                        <div key={comment.id}>
+                            <hr className="ml-4 my-6 w-12 rotate-90" />
+                            <Card className="mt-4">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <span>{commentUser?.name || 'Unknown User'} wrote {commentTime}:</span>
+                                        {isAdmin && (
+                                            <Badge variant="secondary" className="text-xs">
+                                                Admin
+                                            </Badge>
+                                        )}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p>
+                                        {comment.comment}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    );
+                })
             }
+            
+            <CommentForm ticketId={parseInt(id)} userId={user.id} />
         </section>
     )
 }

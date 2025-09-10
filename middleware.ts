@@ -4,7 +4,7 @@ import { getSession } from '@/lib/auth/session';
 import NextAuth from 'next-auth';
 import authConfig from './auth.config';
 
-const protectedRoutes = ['/dashboard', '/settings'];
+const protectedRoutes = ['/dashboard', '/settings', '/courses'];
 const unaccessibleWhenConnected = ['/sign-in', '/sign-up'];
 
 export async function middleware(request: NextRequest) {

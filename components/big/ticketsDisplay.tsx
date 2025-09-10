@@ -2,15 +2,16 @@ import { Ticket } from "@/lib/db/schema";
 import { Badge } from "@/components/ui/badge";
 import { Check, Circle, Loader } from "lucide-react";
 import Link from "next/link";
+import { formatTicketStatus } from "@/lib/utils";
 
-export default async function TicketsDisplay({ admin, tickets }: { admin?: boolean, tickets?: Ticket[] }) {
+export default function TicketsDisplay({ admin, tickets }: { admin?: boolean, tickets?: Ticket[] }) {
 
     return (
         <div className="flex flex-col gap-2">
             {tickets?.length === 0 ?
                 <div>No tickets found</div> : tickets ?
                 tickets.map((ticket) => (
-                    <Link href={`/settings${admin && '/admin'}/tickets/${ticket.id}`} key={ticket.id} className="flex justify-between px-4 py-2 duration-100 rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground gap-4 cursor-pointer">
+                    <Link href={`/settings${admin !== undefined ? '/admin' : ''}/tickets/${ticket.id}`} key={ticket.id} className="flex justify-between px-4 py-2 duration-100 rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground gap-4 cursor-pointer">
                         <div className="flex justify-start items-end gap-4">
                             <p className="text-gray-300 dark:text-gray-700">#{ticket.id}</p>
                             <h2 className="font-bold">{ticket.title}</h2>
@@ -18,9 +19,11 @@ export default async function TicketsDisplay({ admin, tickets }: { admin?: boole
                         </div>
                         <Badge variant="secondary" className="gap-1">
                             {
-                                ticket.status === 'open' ? (<Circle className="size-4" />) : ticket.status === 'closed' ? (<Check className="size-4" />) : (<Loader className="size-4" />)
+                                ticket.status === 'open' ? (<Circle className="size-4" />) : 
+                                ticket.status === 'closed' ? (<Check className="size-4" />) : 
+                                (<Loader className="size-4" />)
                             }
-                            {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                            {formatTicketStatus(ticket.status)}
                             </Badge>
                     </Link>
                 ))

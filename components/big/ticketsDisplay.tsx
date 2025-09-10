@@ -4,7 +4,7 @@ import { Check, Circle, Loader } from "lucide-react";
 import Link from "next/link";
 import { formatTicketStatus } from "@/lib/utils";
 
-export default async function TicketsDisplay({ admin, tickets }: { admin?: boolean, tickets?: Ticket[] }) {
+export default function TicketsDisplay({ admin, tickets }: { admin?: boolean, tickets?: Ticket[] }) {
 
     return (
         <div className="flex flex-col gap-2">

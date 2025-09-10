@@ -27,15 +27,15 @@ import { validatePasswordStrength } from '@/lib/utils';
 
 // Custom password validation schema
 const passwordSchema = z.string()
-    .min(8, "Password must be at least 8 characters long")
-    .max(100, "Password must be at most 100 characters long")
-    .refine((password) => {
-        const validation = validatePasswordStrength(password);
-        return validation.isValid;
-    }, (password) => {
-        const validation = validatePasswordStrength(password);
-        return { message: validation.errors.join(', ') };
-    });
+  .min(8, "Password must be at least 8 characters long")
+  .max(100, "Password must be at most 100 characters long")
+  .refine((password) => {
+    const validation = validatePasswordStrength(password);
+    return validation.isValid;
+  }, (password) => {
+    const validation = validatePasswordStrength(password);
+    return { message: validation.errors.join(', ') };
+  });
 
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
@@ -75,10 +75,9 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     return { error: 'Invalid email or password. Please try again.' };
   }
 
-  await Promise.all([
-    setSession(foundUser),
-    logActivity(foundTeam?.id, foundUser.id, ActivityType.SIGN_IN),
-  ]);
+  await setSession(foundUser);
+
+  await logActivity(foundTeam?.id, foundUser.id, ActivityType.SIGN_IN);
 
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
@@ -100,6 +99,7 @@ const signUpSchema = z.object({
 });
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
+  console.log("Signing up user...");
   const { email, password, inviteId } = data;
 
   const existingUser = await db

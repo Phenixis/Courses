@@ -7,7 +7,7 @@ import {
   getUser,
   updateTeamSubscription,
 } from '@/lib/db/queries';
-import { getAccessByUserId } from '@/lib/db/queries/access';
+import { hasAccess } from '@/lib/db/queries/access';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -40,14 +40,9 @@ export async function createCheckoutSession({
   // Check if user already has access to this product to avoid duplicate purchases
   const productId = typeof price.product === 'string' ? price.product : price.product?.id;
 
-  if (productId) {
-    const userAccess = await getAccessByUserId(user.id);
-    const hasAccess = userAccess.some(access => access.stripeProductId === productId);
-
-    if (hasAccess) {
-      // User already has access to this product, redirect to course page
-      redirect(`/courses/${productId}`); // Adjust the URL as needed
-    }
+  if (productId && await hasAccess(user.id, productId)) {
+    // User already has access to this product, redirect to course page
+    redirect(`/courses/${productId}`);
   }
 
   const session = await stripe.checkout.sessions.create({

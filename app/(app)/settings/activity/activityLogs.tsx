@@ -9,6 +9,9 @@ import {
     Mail,
     CheckCircle,
     type LucideIcon,
+    CircleAlert,
+    ShoppingCart,
+    CircleX
 } from 'lucide-react';
 import { ActivityType } from '@/lib/db/schema';
 import { getActivityLogs } from '@/lib/db/queries';
@@ -17,14 +20,45 @@ const iconMap: Record<ActivityType, LucideIcon> = {
     [ActivityType.SIGN_UP]: UserPlus,
     [ActivityType.SIGN_IN]: UserCog,
     [ActivityType.SIGN_OUT]: LogOut,
+
+    [ActivityType.PASSWORD_RESET]: Lock,
     [ActivityType.UPDATE_PASSWORD]: Lock,
-    [ActivityType.DELETE_ACCOUNT]: UserMinus,
     [ActivityType.UPDATE_ACCOUNT]: Settings,
+    [ActivityType.DELETE_ACCOUNT]: UserMinus,
+
     [ActivityType.CREATE_TEAM]: UserPlus,
-    [ActivityType.REMOVE_TEAM_MEMBER]: UserMinus,
     [ActivityType.INVITE_TEAM_MEMBER]: Mail,
     [ActivityType.ACCEPT_INVITATION]: CheckCircle,
+    [ActivityType.REMOVE_TEAM_MEMBER]: UserMinus,
+
+    [ActivityType.PRODUCT_BOUGHT]: ShoppingCart,
+    [ActivityType.PRODUCT_REFUNDED]: CircleX,
+    [ActivityType.PRODUCT_REFUND_FAILED]: CircleAlert,
 };
+
+const messageMap: Record<ActivityType, string> = {
+    [ActivityType.SIGN_UP]: 'You signed up.',
+    [ActivityType.SIGN_IN]: 'You signed in.',
+    [ActivityType.SIGN_OUT]: 'You signed out.',
+
+    [ActivityType.PASSWORD_RESET]: 'You reset your password.',
+    [ActivityType.UPDATE_PASSWORD]: 'You changed your password.',
+    [ActivityType.UPDATE_ACCOUNT]: 'You updated your account.',
+    [ActivityType.DELETE_ACCOUNT]: 'You deleted your account.',
+
+    [ActivityType.CREATE_TEAM]: 'You created a new team.',
+    [ActivityType.INVITE_TEAM_MEMBER]: 'You invited a team member.',
+    [ActivityType.ACCEPT_INVITATION]: 'You accepted an invitation.',
+    [ActivityType.REMOVE_TEAM_MEMBER]: 'You removed a team member.',
+    
+    [ActivityType.PRODUCT_BOUGHT]: 'You bought a product.',
+    [ActivityType.PRODUCT_REFUNDED]: 'A refund was issued for a product',
+    [ActivityType.PRODUCT_REFUND_FAILED]: 'The refund of a product failed. You got access back to the product.',
+};
+
+function formatAction(action: ActivityType): string {
+    return messageMap[action] || 'Unknown action occurred';
+}
 
 function getRelativeTime(date: Date) {
     const now = new Date();
@@ -39,34 +73,6 @@ function getRelativeTime(date: Date) {
         return `${Math.floor(diffInSeconds / 86400)} days ago`;
     return date.toLocaleDateString();
 }
-
-function formatAction(action: ActivityType): string {
-    switch (action) {
-        case ActivityType.SIGN_UP:
-            return 'You signed up';
-        case ActivityType.SIGN_IN:
-            return 'You signed in';
-        case ActivityType.SIGN_OUT:
-            return 'You signed out';
-        case ActivityType.UPDATE_PASSWORD:
-            return 'You changed your password';
-        case ActivityType.DELETE_ACCOUNT:
-            return 'You deleted your account';
-        case ActivityType.UPDATE_ACCOUNT:
-            return 'You updated your account';
-        case ActivityType.CREATE_TEAM:
-            return 'You created a new team';
-        case ActivityType.REMOVE_TEAM_MEMBER:
-            return 'You removed a team member';
-        case ActivityType.INVITE_TEAM_MEMBER:
-            return 'You invited a team member';
-        case ActivityType.ACCEPT_INVITATION:
-            return 'You accepted an invitation';
-        default:
-            return 'Unknown action occurred';
-    }
-}
-
 export default async function ActivityLogs() {
     const logs = await getActivityLogs();
 

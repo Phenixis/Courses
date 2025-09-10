@@ -83,5 +83,5 @@ export async function cancelRefund(refundId: string): Promise<void> {
 
     if (userTeam === null) return;
 
-    await logActivity(userTeam.id, userId, ActivityType.PRODUCT_REFUND_CANCELED);
+    await logActivity(userTeam.id, userId, ActivityType.PRODUCT_REFUND_FAILED);
 }

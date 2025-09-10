@@ -7,9 +7,11 @@ export const accessTable = lib.pgTable('access', {
     userId: lib.text("user_id").notNull().references(() => userTable.id, { onDelete: 'cascade' }),
     stripeProductId: lib.varchar('stripe_product_id', { length: 255 }).notNull(),
 
-    stripeCustomerId: lib.text('stripe_customer_id').notNull().unique(),
+    stripeCustomerId: lib.text('stripe_customer_id').notNull(),
     stripePriceId: lib.varchar('stripe_price_id', { length: 255 }).notNull(),
     paymentIntentId: lib.varchar('payment_intent_id', { length: 255 }).notNull(),
+
+    refundId: lib.varchar('refund_id', { length: 255 }),
 
     createdAt: lib.timestamp('created_at').notNull().defaultNow(),
     updatedAt: lib.timestamp('updated_at').notNull().defaultNow(),

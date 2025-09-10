@@ -15,7 +15,21 @@
 
 ### Others
 - [ ] Add more Activity Logs
-- [ ] Add "type" to the feedback
+  - [x] Product bought
+  - [x] Product refunded
+  - [x] Product refund failed
+  - [ ] Subscription created
+  - [ ] Subscription updated
+  - [ ] Subscription cancelled
+  - [ ] Subscription resumed
+  - [ ] Payment failed
+  - [ ] Payment succeeded
+  - [ ] Payment refunded
+  - [ ] Payment refund failed
+  - [ ] Ticket created
+  - [ ] Finished a chapter
+  - [ ] Finished a course
+- [ ] Add "type" to the feedback (not sure what I meant at the time)
 - [x] Personnalize the pricing page based on the active Stripe products
 - [x] Add the privacy policy
 - [x] Stylize the Terms of Service page
@@ -26,9 +40,9 @@
 ### Admin
 - [x] Add a product in the pricing section
 - [ ] ~~Add a price in the pricing section~~ Removed
-- [ ] Add the ability to answer to a ticket
-- [ ] Add the ability to change the status of a ticket
-- [ ] Add the ability to filter/sort tickets
+- [x] Add the ability to answer to a ticket
+- [x] Add the ability to change the status of a ticket
+- [x] Add the ability to filter/sort tickets
 
 
 ## Getting Started

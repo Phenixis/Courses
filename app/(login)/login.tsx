@@ -82,7 +82,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
             return (
                 <Link
                     href={`/sign-up${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
                 >
                     Back to our old login flow
                 </Link>
@@ -91,7 +91,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
         return (
             <Link
                 href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary basis-2/5"
+                className="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary basis-2/5"
             >
                 {mode === 'signin' ? 'Create an account' : 'Sign in to existing account'}
             </Link>
@@ -103,7 +103,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
             return (
                 <Link
                     href={`/login${Array.from(searchParams.entries()).map(([key, value], idx) => `${idx === 0 ? '?' : '&'}${key}=${value}`).join('')}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:dark:text-gray-100 hover:underline"
                 >
                     Try our new login flow
                 </Link>
@@ -121,7 +121,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
             <div>
                 <Label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                     Email
                 </Label>
@@ -318,7 +318,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                 <div className="text-red-500 text-sm">{state.error}</div>
             )}
             {mode === 'login' && error && (
-                <div className="text-gray-500 text-sm">{error}</div>
+                <div className="text-gray-500 dark:text-gray-400 text-sm">{error}</div>
             )}
 
             <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:space-x-2">

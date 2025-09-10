@@ -33,7 +33,7 @@ export default function PricingCard({
                         currency === 'eur' ? '€' : ''
                     }
                     {' '}
-                    <span className="text-xl font-normal text-gray-600">
+                    <span className="text-xl font-normal text-gray-600 dark:text-gray-400">
                         per {interval === 'one-time' ? 'lifetime' : interval}
                     </span>
                 </p>
@@ -41,7 +41,7 @@ export default function PricingCard({
             <CardContent>
                 {
                     trialDays > 0 && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                             with {trialDays} day free trial
                         </p>
                     )
@@ -50,7 +50,7 @@ export default function PricingCard({
                     {features.map((feature, index) => (
                         <li key={index} className="flex items-start">
                             <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{feature}</span>
+                            <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                         </li>
                     ))}
                 </ul>

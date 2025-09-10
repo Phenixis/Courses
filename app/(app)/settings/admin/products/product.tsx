@@ -48,7 +48,7 @@ export default function Product({
                             {(product.description || "").split("\n").map((feature, index) => (
                                 <li key={index} className="flex items-center mb-2">
                                     <Check className="size-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                                    <span className="text-sm text-gray-700">{feature}</span>
+                                    <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
                                 </li>
                             ))}
                         </ul>

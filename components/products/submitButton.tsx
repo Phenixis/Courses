@@ -32,7 +32,7 @@ export function SubmitButton({
             </>
             ) : (
             <>
-                <span className="relative block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-white before:transform before:scale-x-0 before:origin-left before:transition-transform before:duration-300 group-hover/Action:before:scale-x-100">
+                <span className="relative block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-white dark:before:bg-gray-200 before:transform before:scale-x-0 before:origin-left before:transition-transform before:duration-300 group-hover/Action:before:scale-x-100">
                 {title}
                 </span>
                 <ArrowRight className="ml-2 h-5 w-5 -translate-x-1 group-hover/Action:translate-x-1 duration-300" aria-hidden="true" />

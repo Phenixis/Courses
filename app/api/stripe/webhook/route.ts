@@ -1,6 +1,7 @@
-import Stripe from 'stripe';
+import { cancelRefund, refundProduct } from '@/lib/db/queries/access';
 import { handleSubscriptionChange, stripe } from '@/lib/payments/stripe';
 import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -17,10 +18,8 @@ const eventListenedTo = [
   { eventName: 'customer.subscription.resumed' },
   { eventName: 'customer.subscription.trial_will_end' },
   { eventName: 'customer.subscription.updated' },
-  { eventName: 'charge.refunded' },
   { eventName: 'refund.created' },
   { eventName: 'refund.failed' },
-  { eventName: 'refund.updated' },
 ]
 
 export async function POST(request: NextRequest) {
@@ -46,14 +45,6 @@ export async function POST(request: NextRequest) {
   const eventType = event.type.split('.');
 
   switch (eventType[0]) {
-    case 'charge':
-      switch (eventType[1]) {
-        case 'refunded':
-          // Stripe Doc : Occurs whenever a charge is refunded, including partial refunds.
-          console.log("Event received:", event.type)
-          break;
-      }
-      break;
     case 'checkout':
       switch (eventType[1]) {
         case 'session':
@@ -124,18 +115,26 @@ export async function POST(request: NextRequest) {
       }
       break;
     case 'refund':
+      const refundObject = event.data.object as Stripe.Refund;
+      const refundId = refundObject.id;
+      const paymentIntent = refundObject.payment_intent;
+
+      if (!paymentIntent || !refundId) break;
+
+      const refundFailed = refundObject.status !== 'failed' && refundObject.status !== 'canceled';
+
       switch (eventType[1]) {
         case 'created':
           // Stripe Doc : Occurs whenever a refund is created.
-          console.log("Event received:", event.type)
+          if (refundFailed) break;
+
+          await refundProduct(typeof paymentIntent === 'string' ? paymentIntent : paymentIntent.id, refundId)
           break;
         case 'failed':
           // Stripe Doc : Occurs whenever a refund fails.
-          console.log("Event received:", event.type)
-          break;
-        case 'updated':
-          // Stripe Doc : Occurs whenever a refund is updated.
-          console.log("Event received:", event.type)
+          if (!refundFailed) break;
+
+          await cancelRefund(refundId)
           break;
       }
   }

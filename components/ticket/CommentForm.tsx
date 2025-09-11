@@ -15,9 +15,10 @@ type ActionState = {
 interface CommentFormProps {
     ticketId: number;
     userId: string;
+    onOptimisticAdd?: (comment: string) => void;
 }
 
-export default function CommentForm({ ticketId, userId }: CommentFormProps) {
+export default function CommentForm({ ticketId, userId, onOptimisticAdd }: CommentFormProps) {
     const [state, formAction, isPending] = useActionState<ActionState, FormData>(
         addComment,
         { error: '', success: '' }
@@ -25,15 +26,20 @@ export default function CommentForm({ ticketId, userId }: CommentFormProps) {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const comment = formData.get('comment') as string;
+        
+        // Trigger optimistic update immediately
+        if (onOptimisticAdd && comment.trim()) {
+            onOptimisticAdd(comment.trim());
+        }
+        
         startTransition(() => {
-            const formData = new FormData(event.currentTarget);
             formAction(formData);
         });
         
-        // Clear the form on successful submission
-        if (!state.error) {
-            (event.target as HTMLFormElement).reset();
-        }
+        // Clear the form immediately
+        (event.target as HTMLFormElement).reset();
     };
 
     return (

@@ -19,9 +19,10 @@ type ActionState = {
 interface AdminControlsProps {
     ticketId: number;
     currentStatus: string;
+    onOptimisticUpdate?: (newStatus: string) => void;
 }
 
-export default function AdminControls({ ticketId, currentStatus }: AdminControlsProps) {
+export default function AdminControls({ ticketId, currentStatus, onOptimisticUpdate }: AdminControlsProps) {
     const [state, formAction, isPending] = useActionState<ActionState, FormData>(
         updateTicketStatus,
         { error: '', success: '' }
@@ -41,6 +42,11 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
     };
 
     const submitStatusChange = (status: string) => {
+        // Trigger optimistic update immediately
+        if (onOptimisticUpdate) {
+            onOptimisticUpdate(status);
+        }
+        
         startTransition(() => {
             const formData = new FormData();
             formData.append('ticketId', ticketId.toString());
@@ -69,13 +75,6 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">Current Status:</span>
-                            <Badge variant="outline">{formatTicketStatus(currentStatus)}</Badge>
-                        </div>
-                    </div>
-
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Change Status:</label>
                         <Select

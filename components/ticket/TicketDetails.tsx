@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useOptimistic } from 'react';
+import { useState, useOptimistic, startTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
@@ -44,13 +44,13 @@ interface TicketDetailsProps {
 
 type OptimisticComment = Comment & { isPending?: boolean };
 
-export default function TicketDetails({ 
-    initialTicket, 
-    user, 
-    initialComments, 
-    commentUsers, 
-    ticketOpenerName, 
-    ticketOpenerIsAdmin 
+export default function TicketDetails({
+    initialTicket,
+    user,
+    initialComments,
+    commentUsers,
+    ticketOpenerName,
+    ticketOpenerIsAdmin
 }: TicketDetailsProps) {
     // Optimistic state for ticket status
     const [optimisticStatus, setOptimisticStatus] = useOptimistic(
@@ -80,7 +80,9 @@ export default function TicketDetails({
             createdAt: new Date(),
             isPending: true
         };
-        addOptimisticComment(optimisticComment);
+        startTransition(() => {
+            addOptimisticComment(optimisticComment);
+        });
     };
 
     const creationTime = formatDistanceToNow(new Date(initialTicket.createdAt), { addSuffix: true });
@@ -117,7 +119,7 @@ export default function TicketDetails({
                     const commentUser = comment.isPending ? user : (index < commentUsers.length ? commentUsers[index] : null);
                     const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
                     const isAdmin = commentUser?.role === 'admin';
-                    
+
                     return (
                         <div key={comment.id}>
                             <hr className="ml-4 my-6 w-12 rotate-90" />
@@ -147,16 +149,16 @@ export default function TicketDetails({
                     );
                 })
             }
-            
-            <CommentForm 
-                ticketId={initialTicket.id} 
-                userId={user.id} 
+
+            <CommentForm
+                ticketId={initialTicket.id}
+                userId={user.id}
                 onOptimisticAdd={handleCommentAdd}
             />
-            
+
             {user.role === 'admin' && (
-                <AdminControls 
-                    ticketId={initialTicket.id} 
+                <AdminControls
+                    ticketId={initialTicket.id}
                     currentStatus={optimisticStatus}
                     onOptimisticUpdate={handleStatusUpdate}
                 />

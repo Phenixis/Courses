@@ -68,7 +68,9 @@ export default function TicketDetails({
     );
 
     const handleStatusUpdate = (newStatus: string) => {
-        setOptimisticStatus(newStatus);
+        startTransition(() => {
+            setOptimisticStatus(newStatus);
+        });
     };
 
     const handleCommentAdd = (comment: string) => {

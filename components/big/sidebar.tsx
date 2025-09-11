@@ -16,6 +16,7 @@ import {
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarHeader,
+    SidebarSeparator,
     useSidebar,
 } from "@/components/ui/sidebar"
 import {
@@ -113,34 +114,39 @@ export function Sidebar() {
                     <Logo title={open} className="py-4" />
                 </SidebarHeader>
                 {
-                    Object.entries(navItems).map(([key, item]) => {
+                    Object.entries(navItems).map(([key, item], index) => {
                         return (
-                            <Collapsible defaultOpen key={key} className="group/collapsible">
-                                <SidebarGroup>
-                                    <SidebarGroupLabel asChild>
-                                        <CollapsibleTrigger>
-                                            {key}
-                                            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                        </CollapsibleTrigger>
-                                    </SidebarGroupLabel>
-                                    <CollapsibleContent>
-                                        <nav className="h-full overflow-y-auto p-2">
-                                            {item.map((subItem) => (
-                                                <Link key={subItem.href} href={subItem.href}>
-                                                    <Button
-                                                        variant={subItem.href === active ? 'secondary' : 'ghost'}
-                                                        className={`p-2 mt-1 w-full justify-start`}
-                                                        onClick={() => setOpen(false)}
-                                                    >
-                                                        <subItem.icon className="size-4" />
-                                                        {open && subItem.label}
-                                                    </Button>
-                                                </Link>
-                                            ))}
-                                        </nav>
-                                    </CollapsibleContent>
-                                </SidebarGroup>
-                            </Collapsible>
+                            <div key={key}>
+                                {/* Add separator before each category when sidebar is collapsed, except for the first one */}
+                                {!open && index > 0 && <SidebarSeparator />}
+                                
+                                <Collapsible defaultOpen disabled={!open} className="group/collapsible">
+                                    <SidebarGroup>
+                                        <SidebarGroupLabel asChild>
+                                            <CollapsibleTrigger disabled={!open}>
+                                                {key}
+                                                {open && <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />}
+                                            </CollapsibleTrigger>
+                                        </SidebarGroupLabel>
+                                        <CollapsibleContent>
+                                            <nav className="h-full overflow-y-auto p-2">
+                                                {item.map((subItem) => (
+                                                    <Link key={subItem.href} href={subItem.href}>
+                                                        <Button
+                                                            variant={subItem.href === active ? 'secondary' : 'ghost'}
+                                                            className={`p-2 mt-1 w-full justify-start`}
+                                                            onClick={() => setOpen(false)}
+                                                        >
+                                                            <subItem.icon className="size-4" />
+                                                            {open && subItem.label}
+                                                        </Button>
+                                                    </Link>
+                                                ))}
+                                            </nav>
+                                        </CollapsibleContent>
+                                    </SidebarGroup>
+                                </Collapsible>
+                            </div>
                         )
                     })
                 }

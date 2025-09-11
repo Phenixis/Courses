@@ -80,19 +80,14 @@ export default function TicketDetails({
     ticketOpenerName,
     ticketOpenerIsAdmin
 }: TicketDetailsProps) {
-    // Optimistic state for ticket status
-    const [optimisticStatus, setOptimisticStatus] = useOptimistic(
-        initialTicket.status,
-        (currentStatus: string, newStatus: string) => newStatus
-    );
+    // Local state for optimistic ticket status
+    const [optimisticStatus, setOptimisticStatus] = useState(initialTicket.status);
 
     // Local state for optimistic comments
     const [optimisticComments, setOptimisticComments] = useState<OptimisticComment[]>([]);
 
     const handleStatusUpdate = (newStatus: string) => {
-        startTransition(() => {
-            setOptimisticStatus(newStatus);
-        });
+        setOptimisticStatus(newStatus);
     };
 
     const handleCommentAdd = (comment: string) => {

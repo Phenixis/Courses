@@ -61,6 +61,9 @@ export enum ActivityType {
   PRODUCT_BOUGHT = 'PRODUCT_BOUGHT',
   PRODUCT_REFUNDED = 'PRODUCT_REFUNDED',
   PRODUCT_REFUND_FAILED = 'PRODUCT_REFUND_FAILED',
+
+  TICKET_CREATED = 'TICKET_CREATED',
+  COMMENT_ADDED = 'COMMENT_ADDED',
 }
 
 export const iconMap: Record<ActivityType, LucideIcon> = {
@@ -81,7 +84,10 @@ export const iconMap: Record<ActivityType, LucideIcon> = {
   [ActivityType.PRODUCT_BOUGHT]: ShoppingCart,
   [ActivityType.PRODUCT_REFUNDED]: CircleX,
   [ActivityType.PRODUCT_REFUND_FAILED]: CircleAlert,
-};
+  
+  [ActivityType.TICKET_CREATED]: CheckCircle,
+  [ActivityType.COMMENT_ADDED]: CheckCircle,
+}
 
 export const messageMap: Record<ActivityType, string> = {
   [ActivityType.SIGN_UP]: 'You signed up.',
@@ -101,4 +107,7 @@ export const messageMap: Record<ActivityType, string> = {
   [ActivityType.PRODUCT_BOUGHT]: 'You bought a product.',
   [ActivityType.PRODUCT_REFUNDED]: 'A refund was issued for a product',
   [ActivityType.PRODUCT_REFUND_FAILED]: 'The refund of a product failed. You got access back to the product.',
+
+  [ActivityType.TICKET_CREATED]: 'You created a support ticket.',
+  [ActivityType.COMMENT_ADDED]: 'You added a comment to a ticket.',
 };

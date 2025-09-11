@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, startTransition, useState } from 'react';
+import { useActionState, startTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,9 +19,10 @@ type ActionState = {
 interface AdminControlsProps {
     ticketId: number;
     currentStatus: string;
+    onOptimisticUpdate?: (newStatus: string) => void;
 }
 
-export default function AdminControls({ ticketId, currentStatus }: AdminControlsProps) {
+export default function AdminControls({ ticketId, currentStatus, onOptimisticUpdate }: AdminControlsProps) {
     const [state, formAction, isPending] = useActionState<ActionState, FormData>(
         updateTicketStatus,
         { error: '', success: '' }
@@ -29,6 +30,21 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
     
     const [selectedStatus, setSelectedStatus] = useState(currentStatus);
     const [showCloseDialog, setShowCloseDialog] = useState(false);
+    const [pendingCloseUpdate, setPendingCloseUpdate] = useState(false);
+
+    // Handle optimistic update for close actions only after server success
+    useEffect(() => {
+        if (state.success && pendingCloseUpdate && onOptimisticUpdate) {
+            onOptimisticUpdate(TicketStatus.CLOSED);
+            setPendingCloseUpdate(false);
+        }
+        // Handle error case for close actions
+        if (state.error && pendingCloseUpdate) {
+            // Reset the selected status to current status if close action failed
+            setSelectedStatus(currentStatus);
+            setPendingCloseUpdate(false);
+        }
+    }, [state.success, state.error, pendingCloseUpdate, onOptimisticUpdate, currentStatus]);
 
     const handleStatusChange = (newStatus: string) => {
         setSelectedStatus(newStatus);
@@ -36,11 +52,16 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
         if (newStatus === TicketStatus.CLOSED) {
             setShowCloseDialog(true);
         } else {
-            submitStatusChange(newStatus);
+            submitStatusChange(newStatus, true); // Immediate optimistic update for non-close actions
         }
     };
 
-    const submitStatusChange = (status: string) => {
+    const submitStatusChange = (status: string, immediateOptimisticUpdate: boolean = false) => {
+        // Trigger optimistic update immediately only for non-close actions
+        if (immediateOptimisticUpdate && onOptimisticUpdate) {
+            onOptimisticUpdate(status);
+        }
+        
         startTransition(() => {
             const formData = new FormData();
             formData.append('ticketId', ticketId.toString());
@@ -50,7 +71,9 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
     };
 
     const handleCloseConfirm = () => {
-        submitStatusChange(TicketStatus.CLOSED);
+        // Set flag to trigger optimistic update only after server success
+        setPendingCloseUpdate(true);
+        submitStatusChange(TicketStatus.CLOSED, false); // No immediate optimistic update
         setShowCloseDialog(false);
     };
 
@@ -69,13 +92,6 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">Current Status:</span>
-                            <Badge variant="outline">{formatTicketStatus(currentStatus)}</Badge>
-                        </div>
-                    </div>
-
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Change Status:</label>
                         <Select
@@ -98,10 +114,7 @@ export default function AdminControls({ ticketId, currentStatus }: AdminControls
                     {state.error && (
                         <p className="text-red-500 text-sm">{state.error}</p>
                     )}
-                    {state.success && (
-                        <p className="text-green-500 text-sm">{state.success}</p>
-                    )}
-
+                    
                     {isPending && (
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,12 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTicket, getComments } from "@/components/feedback/actions";
 import { getUser } from "@/lib/db/queries";
 import { redirect } from "next/navigation";
-import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import CommentForm from '@/components/ticket/CommentForm';
-import AdminControls from '@/components/ticket/AdminControls';
-import { formatTicketStatus } from '@/lib/utils';
+import TicketDetails from '@/components/ticket/TicketDetails';
 
 export default async function Page({
     params
@@ -15,7 +11,6 @@ export default async function Page({
 }) {
     const id = (await params).id;
     const ticket = await getTicket(parseInt(id));
-    const creationTime = formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true });
     const user = await getUser();
     const comments = await getComments(parseInt(id));
 
@@ -42,66 +37,13 @@ export default async function Page({
     );
 
     return (
-        <section className="flex-1 p-4 lg:p-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100">
-                    <span className="text-gray-300 dark:text-gray-700">#{ticket.id}</span> {ticket.title}
-                </h1>
-                <Badge variant="outline">{formatTicketStatus(ticket.status)}</Badge>
-            </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <span>{ticketOpenerName} wrote {creationTime}:</span>
-                        {ticketOpenerIsAdmin && (
-                            <Badge variant="secondary" className="text-xs">
-                                Admin
-                            </Badge>
-                        )}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>
-                        {ticket.description}
-                    </p>
-                </CardContent>
-            </Card>
-            {
-                comments.map((comment, index) => {
-                    const commentUser = commentUsers[index];
-                    const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
-                    const isAdmin = commentUser?.role === 'admin';
-                    
-                    return (
-                        <div key={comment.id}>
-                            <hr className="ml-4 my-6 w-12 rotate-90" />
-                            <Card className="mt-4">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <span>{commentUser?.name || 'Unknown User'} wrote {commentTime}:</span>
-                                        {isAdmin && (
-                                            <Badge variant="secondary" className="text-xs">
-                                                Admin
-                                            </Badge>
-                                        )}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>
-                                        {comment.comment}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    );
-                })
-            }
-            
-            <CommentForm ticketId={parseInt(id)} userId={user.id} />
-            
-            {user.role === 'admin' && (
-                <AdminControls ticketId={parseInt(id)} currentStatus={ticket.status} />
-            )}
-        </section>
+        <TicketDetails
+            initialTicket={ticket}
+            user={user}
+            initialComments={comments}
+            commentUsers={commentUsers}
+            ticketOpenerName={ticketOpenerName}
+            ticketOpenerIsAdmin={ticketOpenerIsAdmin}
+        />
     )
 }

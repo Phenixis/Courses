@@ -43,16 +43,16 @@ export default function CommentForm({ ticketId, userId, onOptimisticAdd }: Comme
     };
 
     return (
-        <Card className="mt-6">
+        <Card>
             <CardHeader>
                 <CardTitle>Add Comment</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit}>
                     <input type="hidden" name="ticketId" value={ticketId} />
                     <input type="hidden" name="userId" value={userId} />
                     
-                    <div>
+                    <div className="mb-4">
                         <Textarea
                             name="comment"
                             placeholder="Write your comment here..."
@@ -64,9 +64,6 @@ export default function CommentForm({ ticketId, userId, onOptimisticAdd }: Comme
 
                     {state.error && (
                         <p className="text-red-500 text-sm">{state.error}</p>
-                    )}
-                    {state.success && (
-                        <p className="text-green-500 text-sm">{state.success}</p>
                     )}
 
                     <Button

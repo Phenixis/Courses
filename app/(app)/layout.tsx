@@ -15,7 +15,7 @@ export default async function Layout({
         <main className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-between">
             <SidebarProvider defaultOpen={defaultOpen}>
                 <Sidebar />
-                <main className="flex-1 overflow-y-auto p-0 md:p-4">
+                <main className="flex-1 p-0 md:p-4">
                     <MobileSidebar />
                     <Breadcrumb />
                     {children}

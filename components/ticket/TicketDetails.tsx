@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import CommentForm from '@/components/ticket/CommentForm';
 import AdminControls from '@/components/ticket/AdminControls';
 import { formatTicketStatus } from '@/lib/utils';
+import { Check, Circle, Loader } from 'lucide-react';
 
 interface User {
     id: string;
@@ -44,6 +45,33 @@ interface TicketDetailsProps {
 
 type OptimisticComment = Comment & { isPending?: boolean };
 
+export function TicketDetailsDisplay({ initialTicket, ticketOpenerName, ticketOpenerIsAdmin, creationTime }: { initialTicket: Ticket, ticketOpenerName: string, ticketOpenerIsAdmin: boolean, creationTime: string }) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 justify-between">
+                    <span>
+                        {ticketOpenerName}
+                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                            {creationTime}
+                        </span>
+                    </span>
+                    {ticketOpenerIsAdmin && (
+                        <Badge variant="secondary" className="text-xs">
+                            Admin
+                        </Badge>
+                    )}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>
+                    {initialTicket.description}
+                </p>
+            </CardContent>
+        </Card>
+    )
+}
+
 export default function TicketDetails({
     initialTicket,
     user,
@@ -58,14 +86,8 @@ export default function TicketDetails({
         (currentStatus: string, newStatus: string) => newStatus
     );
 
-    // Optimistic state for comments
-    const [optimisticComments, addOptimisticComment] = useOptimistic(
-        initialComments.map(comment => ({ ...comment, isPending: false })) as OptimisticComment[],
-        (currentComments: OptimisticComment[], newComment: OptimisticComment) => [
-            ...currentComments,
-            { ...newComment, isPending: true }
-        ]
-    );
+    // Local state for optimistic comments
+    const [optimisticComments, setOptimisticComments] = useState<OptimisticComment[]>([]);
 
     const handleStatusUpdate = (newStatus: string) => {
         startTransition(() => {
@@ -82,89 +104,70 @@ export default function TicketDetails({
             createdAt: new Date(),
             isPending: true
         };
-        startTransition(() => {
-            addOptimisticComment(optimisticComment);
-        });
+        setOptimisticComments(prev => [...prev, optimisticComment]);
     };
 
     const creationTime = formatDistanceToNow(new Date(initialTicket.createdAt), { addSuffix: true });
 
+    // Merge server comments and optimistic comments, filtering out duplicates
+    const mergedComments: OptimisticComment[] = [
+        ...initialComments.map(comment => ({ ...comment, isPending: false })),
+        ...optimisticComments.filter(
+            oc => !initialComments.some(sc => sc.comment === oc.comment && sc.userId === oc.userId && Math.abs(new Date(sc.createdAt).getTime() - new Date(oc.createdAt).getTime()) < 10000)
+        )
+    ];
+
     return (
-        <section className="flex-1 p-4 lg:p-8">
-            <div className="flex justify-between items-center mb-6">
+        <section className="relative p-4 lg:p-8">
+            <header className="flex justify-between items-center mb-6 z-10 sticky top-0 px-2 py-4 rounded bg-gray-50 dark:bg-gray-900">
                 <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100">
                     <span className="text-gray-300 dark:text-gray-700">#{initialTicket.id}</span> {initialTicket.title}
                 </h1>
-                <Badge variant="outline">{formatTicketStatus(optimisticStatus)}</Badge>
+                <Badge variant="secondary" className="gap-1">
+                    {
+                        optimisticStatus === 'open' ? (<Circle className="size-4" />) :
+                            optimisticStatus === 'closed' ? (<Check className="size-4" />) :
+                                (<Loader className="size-4" />)
+                    }
+                    {formatTicketStatus(optimisticStatus)}
+                </Badge>
+            </header>
+            <div className='px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-screen'>
+                <article className="col-span-2">
+                    <TicketDetailsDisplay initialTicket={initialTicket} ticketOpenerName={ticketOpenerName} ticketOpenerIsAdmin={ticketOpenerIsAdmin} creationTime={creationTime} />
+                    {
+                        mergedComments.map((comment, index) => {
+                            // For optimistic comments, use current user data
+                            // For server comments, use commentUsers
+                            const commentUser = comment.isPending ? user : (index < commentUsers.length ? commentUsers[index] : null);
+                            const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+                            const isAdmin = commentUser?.role === 'admin';
+
+                            return (
+                                <div key={comment.id}>
+                                    <hr className="ml-4 my-6 w-12 rotate-90" />
+                                    <TicketDetailsDisplay initialTicket={{ id: comment.id, title: '', description: comment.comment, status: '', createdAt: comment.createdAt }} ticketOpenerName={commentUser?.name || 'Unknown User'} ticketOpenerIsAdmin={isAdmin} creationTime={commentTime} />
+                                </div>
+                            );
+                        })
+                    }
+                </article>
+                <aside className="sticky top-12 h-fit">
+                    <CommentForm
+                        ticketId={initialTicket.id}
+                        userId={user.id}
+                        onOptimisticAdd={handleCommentAdd}
+                    />
+
+                    {user.role === 'admin' && (
+                        <AdminControls
+                            ticketId={initialTicket.id}
+                            currentStatus={optimisticStatus}
+                            onOptimisticUpdate={handleStatusUpdate}
+                        />
+                    )}
+                </aside>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <span>{ticketOpenerName} wrote {creationTime}:</span>
-                        {ticketOpenerIsAdmin && (
-                            <Badge variant="secondary" className="text-xs">
-                                Admin
-                            </Badge>
-                        )}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>
-                        {initialTicket.description}
-                    </p>
-                </CardContent>
-            </Card>
-            {
-                optimisticComments.map((comment, index) => {
-                    // For existing comments, use the original user data
-                    // For optimistic comments, use current user data
-                    const commentUser = comment.isPending ? user : (index < commentUsers.length ? commentUsers[index] : null);
-                    const commentTime = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
-                    const isAdmin = commentUser?.role === 'admin';
-
-                    return (
-                        <div key={comment.id}>
-                            <hr className="ml-4 my-6 w-12 rotate-90" />
-                            <Card className={`mt-4 ${comment.isPending ? 'opacity-70' : ''}`}>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <span>
-                                            {commentUser?.name || 'Unknown User'} wrote {commentTime}:
-                                            {comment.isPending && (
-                                                <span className="text-xs text-gray-500 ml-2">(sending...)</span>
-                                            )}
-                                        </span>
-                                        {isAdmin && (
-                                            <Badge variant="secondary" className="text-xs">
-                                                Admin
-                                            </Badge>
-                                        )}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>
-                                        {comment.comment}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    );
-                })
-            }
-
-            <CommentForm
-                ticketId={initialTicket.id}
-                userId={user.id}
-                onOptimisticAdd={handleCommentAdd}
-            />
-
-            {user.role === 'admin' && (
-                <AdminControls
-                    ticketId={initialTicket.id}
-                    currentStatus={optimisticStatus}
-                    onOptimisticUpdate={handleStatusUpdate}
-                />
-            )}
         </section>
     );
 }

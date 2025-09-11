@@ -97,10 +97,7 @@ export default function AdminControls({ ticketId, currentStatus, onOptimisticUpd
                     {state.error && (
                         <p className="text-red-500 text-sm">{state.error}</p>
                     )}
-                    {state.success && (
-                        <p className="text-green-500 text-sm">{state.success}</p>
-                    )}
-
+                    
                     {isPending && (
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <Loader2 className="h-4 w-4 animate-spin" />

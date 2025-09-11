@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, startTransition, useState } from 'react';
+import { useActionState, startTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +30,21 @@ export default function AdminControls({ ticketId, currentStatus, onOptimisticUpd
     
     const [selectedStatus, setSelectedStatus] = useState(currentStatus);
     const [showCloseDialog, setShowCloseDialog] = useState(false);
+    const [pendingCloseUpdate, setPendingCloseUpdate] = useState(false);
+
+    // Handle optimistic update for close actions only after server success
+    useEffect(() => {
+        if (state.success && pendingCloseUpdate && onOptimisticUpdate) {
+            onOptimisticUpdate(TicketStatus.CLOSED);
+            setPendingCloseUpdate(false);
+        }
+        // Handle error case for close actions
+        if (state.error && pendingCloseUpdate) {
+            // Reset the selected status to current status if close action failed
+            setSelectedStatus(currentStatus);
+            setPendingCloseUpdate(false);
+        }
+    }, [state.success, state.error, pendingCloseUpdate, onOptimisticUpdate, currentStatus]);
 
     const handleStatusChange = (newStatus: string) => {
         setSelectedStatus(newStatus);
@@ -37,13 +52,13 @@ export default function AdminControls({ ticketId, currentStatus, onOptimisticUpd
         if (newStatus === TicketStatus.CLOSED) {
             setShowCloseDialog(true);
         } else {
-            submitStatusChange(newStatus);
+            submitStatusChange(newStatus, true); // Immediate optimistic update for non-close actions
         }
     };
 
-    const submitStatusChange = (status: string) => {
-        // Trigger optimistic update immediately
-        if (onOptimisticUpdate) {
+    const submitStatusChange = (status: string, immediateOptimisticUpdate: boolean = false) => {
+        // Trigger optimistic update immediately only for non-close actions
+        if (immediateOptimisticUpdate && onOptimisticUpdate) {
             onOptimisticUpdate(status);
         }
         
@@ -56,7 +71,9 @@ export default function AdminControls({ ticketId, currentStatus, onOptimisticUpd
     };
 
     const handleCloseConfirm = () => {
-        submitStatusChange(TicketStatus.CLOSED);
+        // Set flag to trigger optimistic update only after server success
+        setPendingCloseUpdate(true);
+        submitStatusChange(TicketStatus.CLOSED, false); // No immediate optimistic update
         setShowCloseDialog(false);
     };
 

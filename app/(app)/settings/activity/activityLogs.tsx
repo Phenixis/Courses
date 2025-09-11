@@ -1,60 +1,9 @@
 import {
     Settings,
-    LogOut,
-    UserPlus,
-    Lock,
-    UserCog,
     AlertCircle,
-    UserMinus,
-    Mail,
-    CheckCircle,
-    type LucideIcon,
-    CircleAlert,
-    ShoppingCart,
-    CircleX
 } from 'lucide-react';
-import { ActivityType } from '@/lib/db/schema';
+import { ActivityType, iconMap, messageMap } from '@/lib/db/schema';
 import { getActivityLogs } from '@/lib/db/queries';
-
-const iconMap: Record<ActivityType, LucideIcon> = {
-    [ActivityType.SIGN_UP]: UserPlus,
-    [ActivityType.SIGN_IN]: UserCog,
-    [ActivityType.SIGN_OUT]: LogOut,
-
-    [ActivityType.PASSWORD_RESET]: Lock,
-    [ActivityType.UPDATE_PASSWORD]: Lock,
-    [ActivityType.UPDATE_ACCOUNT]: Settings,
-    [ActivityType.DELETE_ACCOUNT]: UserMinus,
-
-    [ActivityType.CREATE_TEAM]: UserPlus,
-    [ActivityType.INVITE_TEAM_MEMBER]: Mail,
-    [ActivityType.ACCEPT_INVITATION]: CheckCircle,
-    [ActivityType.REMOVE_TEAM_MEMBER]: UserMinus,
-
-    [ActivityType.PRODUCT_BOUGHT]: ShoppingCart,
-    [ActivityType.PRODUCT_REFUNDED]: CircleX,
-    [ActivityType.PRODUCT_REFUND_FAILED]: CircleAlert,
-};
-
-const messageMap: Record<ActivityType, string> = {
-    [ActivityType.SIGN_UP]: 'You signed up.',
-    [ActivityType.SIGN_IN]: 'You signed in.',
-    [ActivityType.SIGN_OUT]: 'You signed out.',
-
-    [ActivityType.PASSWORD_RESET]: 'You reset your password.',
-    [ActivityType.UPDATE_PASSWORD]: 'You changed your password.',
-    [ActivityType.UPDATE_ACCOUNT]: 'You updated your account.',
-    [ActivityType.DELETE_ACCOUNT]: 'You deleted your account.',
-
-    [ActivityType.CREATE_TEAM]: 'You created a new team.',
-    [ActivityType.INVITE_TEAM_MEMBER]: 'You invited a team member.',
-    [ActivityType.ACCEPT_INVITATION]: 'You accepted an invitation.',
-    [ActivityType.REMOVE_TEAM_MEMBER]: 'You removed a team member.',
-    
-    [ActivityType.PRODUCT_BOUGHT]: 'You bought a product.',
-    [ActivityType.PRODUCT_REFUNDED]: 'A refund was issued for a product',
-    [ActivityType.PRODUCT_REFUND_FAILED]: 'The refund of a product failed. You got access back to the product.',
-};
 
 function formatAction(action: ActivityType): string {
     return messageMap[action] || 'Unknown action occurred';

@@ -38,7 +38,13 @@ export default function AdminControls({ ticketId, currentStatus, onOptimisticUpd
             onOptimisticUpdate(TicketStatus.CLOSED);
             setPendingCloseUpdate(false);
         }
-    }, [state.success, pendingCloseUpdate, onOptimisticUpdate]);
+        // Handle error case for close actions
+        if (state.error && pendingCloseUpdate) {
+            // Reset the selected status to current status if close action failed
+            setSelectedStatus(currentStatus);
+            setPendingCloseUpdate(false);
+        }
+    }, [state.success, state.error, pendingCloseUpdate, onOptimisticUpdate, currentStatus]);
 
     const handleStatusChange = (newStatus: string) => {
         setSelectedStatus(newStatus);

@@ -2,11 +2,11 @@
 
 import { desc, and, eq, isNull, or, isNotNull, count, asc, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
-import { ticketTable, ticketCommentTable, Ticket, NewTicket, TicketStatus, NewTicketComment } from '@/lib/db/schema';
+import { ticketTable, ticketCommentTable, Ticket, NewTicket, TicketStatus, NewTicketComment, ActivityType } from '@/lib/db/schema';
 import { ActionState } from '@/lib/auth/middleware';
+import { getTeamForUser, logActivity } from '@/lib/db/queries';
 
 export async function sendFeedback(state: ActionState, data: FormData) {
-
     const newTicket: NewTicket = {
         title: data.get('title') as string,
         description: data.get('description') as string,
@@ -16,6 +16,10 @@ export async function sendFeedback(state: ActionState, data: FormData) {
     };
 
     const result = await db.insert(ticketTable).values(newTicket);
+    const userId = data.get('userId');
+    if (userId !== null && typeof userId === 'string') {
+        await logActivity(null, userId, ActivityType.TICKET_CREATED);
+    }
 
     return { success: 'Feedback sent successfully. You can now find it in the Ticket section, in your settings.' };
 }
@@ -72,6 +76,8 @@ export async function addComment(state: ActionState, data: FormData) {
         return { error: 'Comment cannot be empty.' };
     }
 
+    const userWithTeam = await getTeamForUser(userId);
+
     const newComment: NewTicketComment = {
         ticketId,
         userId,
@@ -86,6 +92,9 @@ export async function addComment(state: ActionState, data: FormData) {
             .update(ticketTable)
             .set({ updatedAt: new Date() })
             .where(eq(ticketTable.id, ticketId));
+
+        
+        await logActivity(userWithTeam?.id, userId, ActivityType.COMMENT_ADDED);
 
         return { success: 'Comment added successfully.' };
     } catch (error) {

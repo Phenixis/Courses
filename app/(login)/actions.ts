@@ -494,6 +494,8 @@ export const forgotPassword = validatedAction(forgotPasswordSchema, async (data)
     return { error: 'This account uses a provider sign-in. Please sign in with your provider.' };
   }
 
+  const userWithTeam = await getUserWithTeam(foundUser.id);
+
   // Import password reset session functions
   const { createPasswordResetSession, deletePasswordResetSessionsForUser } = await import('@/lib/db/queries/password-reset-session');
   const { sendEmail } = await import('@/components/email/send_email');
@@ -523,6 +525,9 @@ export const forgotPassword = validatedAction(forgotPasswordSchema, async (data)
 
   try {
     await sendEmail(email, 'Password Reset Request', emailContent);
+
+    await logActivity(userWithTeam?.teamId, foundUser.id, ActivityType.REQUEST_PASSWORD_RESET);
+
     return { success: 'If an account with that email exists, we have sent you a password reset link.' };
   } catch (error) {
     console.error('Error sending password reset email:', error);

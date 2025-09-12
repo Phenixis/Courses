@@ -18,15 +18,20 @@
   - [x] Product bought
   - [x] Product refunded
   - [x] Product refund failed
+  
   - [ ] Subscription created
   - [ ] Subscription updated
   - [ ] Subscription cancelled
   - [ ] Subscription resumed
+
   - [ ] Payment failed
   - [ ] Payment succeeded
   - [ ] Payment refunded
   - [ ] Payment refund failed
-  - [ ] Ticket created
+
+  - [x] Ticket created
+  - [x] Comment added to a ticket
+
   - [ ] Finished a chapter
   - [ ] Finished a course
 - [ ] Add "type" to the feedback (not sure what I meant at the time)

@@ -76,3 +76,18 @@ export function validatePasswordStrength(password: string): {
         requirements
     };
 }
+
+
+export function formatToSnakeCase(str: string): string {
+    return str
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+}
+
+export function formatToTitleCase(str: string): string {
+    return str
+        .replace(/_/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}

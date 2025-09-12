@@ -8,6 +8,7 @@ import {
   updateTeamSubscription,
 } from '@/lib/db/queries';
 import { hasAccess } from '@/lib/db/queries/access';
+import { formatToSnakeCase } from '../utils';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -224,6 +225,18 @@ export async function getStripeProducts(active?: boolean) {
         ? product.default_price
         : product.default_price?.id,
   }));
+}
+
+export async function getStripeProductByTitle(title: string) {
+  const products = await stripe.products.list({
+    active: true,
+    limit: 1,
+    // Stripe does not support direct filtering by name, so we fetch all and filter manually
+  });
+
+  const product = products.data.find(p => formatToSnakeCase(p.name) === formatToSnakeCase(title));
+
+  return product || null;
 }
 
 export async function getStripeProductById(id: string) {

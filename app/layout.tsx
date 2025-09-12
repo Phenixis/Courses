@@ -4,6 +4,7 @@ import { Manrope } from 'next/font/google';
 import { ValuesProvider } from '@/lib/auth';
 import { getUser } from '@/lib/db/queries';
 import { Toaster } from '@/components/ui/sonner';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
     title: {
@@ -19,11 +20,13 @@ export const viewport: Viewport = {
 
 const manrope = Manrope({ subsets: ['latin'] });
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const cookieStore = await cookies();
+    const theme = cookieStore.get('theme')?.value;
     let userPromise = getUser();
     let appName = process.env.APP_NAME || '[App]';
     let companyName = process.env.COMPANY_NAME || 'Company';
@@ -31,7 +34,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`bg-white text-black dark:text-white ${manrope.className}`}
+            className={`bg-white text-black dark:text-white ${manrope.className} ${theme === 'dark' ? 'dark' : ''}`}
         >
             <body>
                 <ValuesProvider userPromise={userPromise} appName={appName} companyName={companyName}>

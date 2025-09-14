@@ -29,7 +29,6 @@ import { redirect, usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 export function MobileSidebar() {
-    const pathname = usePathname();
     const { user, setUser } = useValues();
     if (!user) {
         redirect('/login');
@@ -53,7 +52,7 @@ export function MobileSidebar() {
                 <Feedback />
                 <UserAvatar isMenuOpen={isMenuTelOpen} setIsMenuOpen={setIsMenuTelOpen} user={user} setUser={setUser} />
             </div>
-        </header>
+        </header >
     )
 }
 
@@ -66,7 +65,7 @@ export function Sidebar() {
     }
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { open, setOpen, toggleSidebar } = useSidebar();
+    const { open, setOpen, toggleSidebar, isMobile } = useSidebar();
 
     const dashboardNavItems = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -116,7 +115,6 @@ export function Sidebar() {
                     Object.entries(navItems).map(([key, item], index) => {
                         return (
                             <div key={key}>
-                                {/* Add separator before each category when sidebar is collapsed, except for the first one */}
                                 {!open && index > 0 && <SidebarSeparator />}
 
                                 <Collapsible defaultOpen disabled={!open} className="group/collapsible">
@@ -137,7 +135,7 @@ export function Sidebar() {
                                                             onClick={() => setOpen(false)}
                                                         >
                                                             <subItem.icon className="size-4" />
-                                                            {open && subItem.label}
+                                                            {open || isMobile ? (subItem.label) : null}
                                                         </Button>
                                                     </Link>
                                                 ))}

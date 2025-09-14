@@ -43,6 +43,7 @@ export default async function EditCoursePage({
                     ]}
                     title={product.name}
                 />
+                {/* <TextEditor /> */}
             </main>
         </div>
     );

@@ -10,6 +10,7 @@ import { ActionButton } from "./actionButton";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { formatToSnakeCase } from "@/lib/utils";
 
 export function ProductDisplay({
     product,
@@ -70,8 +71,8 @@ export function ProductDisplay({
                             )
                         }
                         {
-                            isAdmin && (
-                                <Link href={`/courses/${product?.stripeProduct.id}/edit`}>
+                            isAdmin && product?.stripeProduct.name && (
+                                <Link href={`/courses/${formatToSnakeCase(product?.stripeProduct.name)}/edit`}>
                                     <Button variant="outline" className="flex-end">
                                         Edit
                                     </Button>

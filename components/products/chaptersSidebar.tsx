@@ -3,19 +3,17 @@
 import {
     SidebarContent,
     SidebarGroup,
-    SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarProvider,
     Sidebar as SidebarRoot,
-    SidebarTrigger,
+    useSidebar
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Lock, PlayCircle } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { CheckCircle2, Lock, Menu, PlayCircle } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Public chapter item shape
 export interface ChapterItem {
@@ -42,7 +40,8 @@ function ChaptersList({
     const searchParams = useSearchParams();
     const router = useRouter();
     const chapterIdParam = searchParams.get("chapterId");
-    const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : undefined;
+    const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
+    const isMobile = useIsMobile();
 
     const onSelect = (chapter: ChapterItem) => {
         router.push(`?chapterId=${chapter.id}`);
@@ -50,8 +49,8 @@ function ChaptersList({
 
     return (
         <SidebarContent className="pt-0">
-            <SidebarGroup className="p-2">
-                <SidebarMenu>
+            <SidebarGroup className={`p-2 ${isMobile ? 'my-auto' : ''}`}>
+                <SidebarMenu className={`${isMobile ? 'my-auto' : ''}`}>
                     {chapters.length === 0 && (
                         <div className="text-xs text-muted-foreground px-2 py-4">
                             No chapters yet.
@@ -104,20 +103,29 @@ export default function ChaptersSidebar({
     showTriggerOnMobile = true,
 }: ChaptersSidebarProps) {
     const isMobile = useIsMobile();
-    // Desktop: always visible (no collapsing). Mobile: offcanvas sheet.
     const collapsible = isMobile ? "offcanvas" : ("none" as const);
+
+    function SidebarToggler() {
+        const { toggleSidebar } = useSidebar();
+        return (
+            <>
+                {isMobile && showTriggerOnMobile && (
+                    <div
+                        className="mb-2 flex items-center gap-2 md:hidden"
+                        onClick={toggleSidebar}
+                    >
+                        <Menu />
+                        Chapters
+                    </div>
+                )}
+            </>
+        );
+    }
 
     return (
         <SidebarProvider defaultOpen>
             <div className={cn("relative", className)}>
-                {isMobile && showTriggerOnMobile && (
-                    <div className="mb-2 flex items-center gap-2 md:hidden">
-                        <SidebarTrigger />
-                        {title && (
-                            <span className="text-sm font-medium">{title}</span>
-                        )}
-                    </div>
-                )}
+                <SidebarToggler />
                 <SidebarRoot
                     collapsible={collapsible}
                     className={cn(
@@ -125,10 +133,7 @@ export default function ChaptersSidebar({
                         !isMobile && "w-64"
                     )}
                 >
-                    <ChaptersList
-                        chapters={chapters}
-                        title={title}
-                    />
+                    <ChaptersList chapters={chapters} title={title} />
                 </SidebarRoot>
             </div>
         </SidebarProvider>

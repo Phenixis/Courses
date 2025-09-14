@@ -1,7 +1,7 @@
 import { getUser } from "@/lib/db/queries";
 import { getStripeProductById } from "@/lib/payments/stripe";
 import { redirect } from "next/navigation";
-
+import { CourseEditor } from "./course-editor";
 
 export default async function EditCoursePage({
     params,
@@ -23,10 +23,9 @@ export default async function EditCoursePage({
     }
 
     return (
-        <div className="flex-1 p-4 lg:p-8">
-            <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100 mb-6">
-            {product.name} [EDIT]
-            </h1>
-        </div>
+        <CourseEditor 
+            stripeProductId={stripeProductId}
+            courseName={product.name}
+        />
     );
 }

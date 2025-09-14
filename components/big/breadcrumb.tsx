@@ -1,7 +1,8 @@
 "use client";
 
+import { Breadcrumb as Bc, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { usePathname } from 'next/navigation';
-import { Breadcrumb as Bc, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { formatToTitleCase, formatToSnakeCase } from '@/lib/utils';
 
 export default function Breadcrumb() {
     const pathname = usePathname();
@@ -23,11 +24,11 @@ export default function Breadcrumb() {
                             <BreadcrumbItem key={index} className="pl-2 border-l">
                                 {
                                     index === pathname.split('/').length - 1 ? (
-                                        <BreadcrumbPage>{path[0].toUpperCase() + path.slice(1)}</BreadcrumbPage>
+                                        <BreadcrumbPage>{formatToTitleCase(path)}</BreadcrumbPage>
                                     ) : (
                                         <BreadcrumbLink href={
                                             pathname.split('/').slice(0, index + 1).join('/')
-                                        }>{path[0].toUpperCase() + path.slice(1)}</BreadcrumbLink>
+                                        }>{formatToTitleCase(path)}</BreadcrumbLink>
                                     )
                                 }
                             </BreadcrumbItem>

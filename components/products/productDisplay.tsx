@@ -131,11 +131,13 @@ export function ProductDisplay({
                             />
                         ) : (
                             <ActionButton
-                                product_id={product.stripeProduct.id}
-                                price={priceToUse || undefined}
-                                isChosenCurrency={isChosenCurrency}
-                                hasAccess={hasAccess}
                                 skeleton={false}
+                                product={{
+                                    name: product.stripeProduct.name,
+                                    price: priceToUse || undefined,
+                                    isChosenCurrency: isChosenCurrency,
+                                    hasAccess: hasAccess!
+                                }}
                             />
                         )
                     }

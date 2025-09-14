@@ -1,14 +1,15 @@
-import { getStripeProductById } from "@/lib/payments/stripe";
+import { getStripeProductByTitle } from "@/lib/payments/stripe";
+import { formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 
 export default async function CoursePage({
     params,
-} : {
-    params: Promise<{ stripeProductId: string }>;
+}: {
+    params: Promise<{ product_name: string }>;
 }) {
-    const { stripeProductId } = await params;
+    const title = formatToTitleCase((await params).product_name);
 
-    const product = await getStripeProductById(stripeProductId);
+    const product = await getStripeProductByTitle(title);
 
     if (!product) {
         return redirect('/courses');

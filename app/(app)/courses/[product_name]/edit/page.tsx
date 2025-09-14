@@ -1,14 +1,16 @@
 import { getUser } from "@/lib/db/queries";
-import { getStripeProductById } from "@/lib/payments/stripe";
+import { getStripeProductByTitle } from "@/lib/payments/stripe";
+import { formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 
 
 export default async function EditCoursePage({
     params,
-} : {
-    params: Promise<{ stripeProductId: string }>;
+}: {
+    params: Promise<{ product_name: string }>;
 }) {
-    const { stripeProductId } = await params;
+    const title = formatToTitleCase((await params).product_name);
+
 
     const user = await getUser();
 
@@ -16,7 +18,7 @@ export default async function EditCoursePage({
         return redirect('/courses');
     }
 
-    const product = await getStripeProductById(stripeProductId);
+    const product = await getStripeProductByTitle(title);
 
     if (!product) {
         return redirect('/courses');
@@ -25,7 +27,7 @@ export default async function EditCoursePage({
     return (
         <div className="flex-1 p-4 lg:p-8">
             <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100 mb-6">
-            {product.name} [EDIT]
+                {product.name} [EDIT]
             </h1>
         </div>
     );

@@ -48,8 +48,6 @@ export async function GET(request: NextRequest) {
       throw new Error('User is not associated with any team.');
     }
 
-    console.log(session);
-
     if (!session.customer || typeof session.customer === 'string') {
       throw new Error('Invalid customer data from Stripe.');
     }

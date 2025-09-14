@@ -1,4 +1,4 @@
-import { cancelRefund, refundProduct } from '@/lib/db/queries/access';
+import { cancelRefund, refundProduct } from '@/lib/db/queries';
 import { handleSubscriptionChange, stripe } from '@/lib/payments/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';

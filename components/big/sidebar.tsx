@@ -1,33 +1,32 @@
 "use client";
 
-import { usePathname, redirect } from 'next/navigation';
-import { useState } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Ticket, Slash, Menu, ChevronDown, SettingsIcon, Home, LayoutDashboard, DollarSign } from 'lucide-react';
-import { useValues } from '@/lib/auth';
-import Feedback from '@/components/feedback/feedback';
 import DarkModeToggle from '@/components/big/darkModeToggler';
-import {
-    Sidebar as SidebarComponent,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarSeparator,
-    useSidebar,
-} from "@/components/ui/sidebar"
+import Logo from '@/components/big/logo';
+import UserAvatar from '@/components/big/userAvatar';
+import Feedback from '@/components/feedback/feedback';
+import { Button } from '@/components/ui/button';
 import {
     ChevronsLeftRightIcon
 } from '@/components/ui/chevrons-left-right';
 import {
     ChevronsRightLeftIcon
 } from '@/components/ui/chevrons-right-left';
-import Logo from '@/components/big/logo';
-import UserAvatar from '@/components/big/userAvatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+    Sidebar as SidebarComponent,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarSeparator,
+    useSidebar
+} from "@/components/ui/sidebar";
+import { useValues } from '@/lib/auth';
+import { Activity, ChevronDown, DollarSign, Home, LayoutDashboard, Menu, Settings, SettingsIcon, Shield, Ticket, Users } from 'lucide-react';
+import Link from 'next/link';
+import { redirect, usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 export function MobileSidebar() {
     const pathname = usePathname();
@@ -88,7 +87,7 @@ export function Sidebar() {
         { href: '/settings/admin/tickets', icon: Ticket, label: 'Tickets' },
     ]
 
-    const navItems : Record<string, { href: string, icon: any, label: string }[]> = {
+    const navItems: Record<string, { href: string, icon: any, label: string }[]> = {
         'Dashboard': dashboardNavItems,
         'Settings': settingsNavItems,
     }
@@ -119,7 +118,7 @@ export function Sidebar() {
                             <div key={key}>
                                 {/* Add separator before each category when sidebar is collapsed, except for the first one */}
                                 {!open && index > 0 && <SidebarSeparator />}
-                                
+
                                 <Collapsible defaultOpen disabled={!open} className="group/collapsible">
                                     <SidebarGroup>
                                         <SidebarGroupLabel asChild>

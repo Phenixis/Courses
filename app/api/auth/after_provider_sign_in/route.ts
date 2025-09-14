@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getTeamForUser, getUser } from "@/lib/db/queries"
-import { NewTeam, teamTable, ActivityType, NewTeamMember, teamMemberTable, invitationTable, userTable } from "@/lib/db/schema"
-import { logActivity } from "@/lib/db/queries"
-import { and, db, eq } from "@/lib/db/queries/library";
 import { setSession } from "@/lib/auth/session";
+import { getUser, logActivity } from "@/lib/db/queries";
+import { and, db, eq } from "@/lib/db/queries/library";
+import { ActivityType, invitationTable, NewTeam, NewTeamMember, teamMemberTable, teamTable, userTable } from "@/lib/db/schema";
 import { createCheckoutSession } from "@/lib/payments/stripe";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);

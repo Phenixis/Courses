@@ -28,6 +28,7 @@ export interface ChaptersSidebarProps {
     title?: string;
     className?: string;
     showTriggerOnMobile?: boolean; // hide if parent supplies its own trigger
+    children?: React.ReactNode;
 }
 
 function ChaptersList({
@@ -101,6 +102,7 @@ export default function ChaptersSidebar({
     title,
     className,
     showTriggerOnMobile = true,
+    children,
 }: ChaptersSidebarProps) {
     const isMobile = useIsMobile();
     const collapsible = isMobile ? "offcanvas" : ("none" as const);
@@ -124,8 +126,7 @@ export default function ChaptersSidebar({
 
     return (
         <SidebarProvider defaultOpen>
-            <div className={cn("relative", className)}>
-                <SidebarToggler />
+            <div className={cn("relative w-full flex gap-4", className)}>
                 <SidebarRoot
                     collapsible={collapsible}
                     className={cn(
@@ -135,6 +136,10 @@ export default function ChaptersSidebar({
                 >
                     <ChaptersList chapters={chapters} title={title} />
                 </SidebarRoot>
+                <div className="flex-1 w-full">
+                    <SidebarToggler />
+                    {children}
+                </div>
             </div>
         </SidebarProvider>
     );

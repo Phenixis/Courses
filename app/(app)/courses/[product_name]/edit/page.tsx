@@ -3,6 +3,7 @@ import { getStripeProductByTitle } from "@/lib/payments/stripe";
 import { formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import ChaptersSidebar from "@/components/products/chaptersSidebar";
+import ChapterEditor from "@/components/products/chapterEditor";
 
 export default async function EditCoursePage({
     params,
@@ -10,7 +11,6 @@ export default async function EditCoursePage({
     params: Promise<{ product_name: string }>;
 }) {
     const title = formatToTitleCase((await params).product_name);
-
 
     const user = await getUser();
 
@@ -42,8 +42,9 @@ export default async function EditCoursePage({
                         }
                     ]}
                     title={product.name}
-                />
-                {/* <TextEditor /> */}
+                >
+                    <ChapterEditor />
+                </ChaptersSidebar>
             </main>
         </div>
     );

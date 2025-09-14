@@ -44,13 +44,13 @@ export default function Breadcrumb() {
                                 }
 
                                 if (isLast) {
-                                    return <BreadcrumbPage className="px-2">
+                                    return <BreadcrumbPage key={index} className="px-2">
                                         {formatToTitleCase(path)}
                                     </BreadcrumbPage>;
                                 }
 
                                 return (
-                                    <BreadcrumbLink className="px-2 border-r" href={segments.slice(0, index + 1).join('/')}>
+                                    <BreadcrumbLink key={index} className="px-2 border-r" href={segments.slice(0, index + 1).join('/')}>
                                         {formatToTitleCase(path)}
                                     </BreadcrumbLink>
                                 );

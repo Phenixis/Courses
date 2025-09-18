@@ -5,21 +5,28 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Suspense, useEffect, useState } from "react";
 // Use client-side markdown renderer for preview to avoid RSC issues
 import { ClientMarkdown } from "@/components/ui/markdown-viewer-client";
+import { useSearchParams } from "next/navigation";
+// import { updateChapterByProductIdAndNumero } from "@/lib/db/queries/chapter";
 
-export default function ChapterEditor() {
+export default function ChapterEditor({
+    stripe_product_id,
+} : {
+    stripe_product_id: string;
+}) {
     const [content, setContent] = useState<string>("# New Chapter\n\nStart writing here...");
     const [saving, setSaving] = useState(false);
     const [previewing, setPreviewing] = useState(false);
     const [previewContent, setPreviewContent] = useState<string | null>(null); // snapshot used for preview
     const [showPreview, setShowPreview] = useState(false);
     const [previewLoading, setPreviewLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const chapterIdParam = searchParams.get("chapterId");
+    const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
 
     const handleSave = async () => {
         setSaving(true);
         try {
-            // Placeholder save logic; integrate with API later
-            await new Promise((r) => setTimeout(r, 600));
-            // You could toast success here
+            // await updateChapterByProductIdAndNumero(stripe_product_id, activeChapterId, { content });
         } finally {
             setSaving(false);
         }
@@ -31,7 +38,7 @@ export default function ChapterEditor() {
         setShowPreview(true);
         try {
             // Simulate any async transformation if needed (e.g., server processing)
-            await new Promise((r) => setTimeout(r, 150));
+            // await new Promise((r) => setTimeout(r, 150));
             setPreviewContent(content); // take snapshot
         } finally {
             setPreviewLoading(false);

@@ -34,7 +34,7 @@ export default async function RootLayout({
     return (
         <html
             lang="en"
-            className={`bg-white text-black dark:text-white ${manrope.className} ${theme === 'dark' ? 'dark' : ''}`}
+            className={`bg-white text-black dark:text-white h-screen ${manrope.className} ${theme === 'dark' ? 'dark' : ''}`}
         >
             <body>
                 <ValuesProvider userPromise={userPromise} appName={appName} companyName={companyName}>

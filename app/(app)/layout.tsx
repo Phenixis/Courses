@@ -12,7 +12,7 @@ export default async function Layout({
     const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-between">
+        <main className="bg-gray-50 dark:bg-gray-900">
             <SidebarProvider defaultOpen={defaultOpen}>
                 <Sidebar />
                 <main className="flex-1 p-0 md:p-4">

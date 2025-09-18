@@ -11,20 +11,14 @@ import {
     useSidebar
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Chapter } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Lock, Menu, PlayCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-// Public chapter item shape
-export interface ChapterItem {
-    id: number;
-    title: string;
-    completed?: boolean;
-    locked?: boolean;
-}
+import { usePathname } from "next/navigation";
 
 export interface ChaptersSidebarProps {
-    chapters: ChapterItem[];
+    chapters: Chapter[];
     title?: string;
     className?: string;
     showTriggerOnMobile?: boolean; // hide if parent supplies its own trigger
@@ -40,12 +34,13 @@ function ChaptersList({
 >) {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const pathname = usePathname();
     const chapterIdParam = searchParams.get("chapterId");
     const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
     const isMobile = useIsMobile();
 
-    const onSelect = (chapter: ChapterItem) => {
-        router.push(`?chapterId=${chapter.id}`);
+    const onSelect = (chapter: Chapter) => {
+        router.push(`${pathname}/${chapter.numero}`);
     };
 
     return (
@@ -59,11 +54,6 @@ function ChaptersList({
                     )}
                     {chapters.map((chapter, idx) => {
                         const isActive = chapter.id === activeChapterId;
-                        const Icon = chapter.locked
-                            ? Lock
-                            : chapter.completed
-                                ? CheckCircle2
-                                : PlayCircle;
                         return (
                             <SidebarMenuItem key={chapter.id}>
                                 <SidebarMenuButton
@@ -71,19 +61,10 @@ function ChaptersList({
                                     onClick={() => onSelect?.(chapter)}
                                     aria-current={isActive ? "true" : undefined}
                                     className={cn(
-                                        "justify-start",
-                                        chapter.locked && "opacity-60 cursor-not-allowed",
-                                        !chapter.locked && "cursor-pointer"
+                                        "justify-start"
                                     )}
-                                    disabled={chapter.locked}
                                     tooltip={chapter.title}
                                 >
-                                    <Icon
-                                        className={cn(
-                                            "size-4",
-                                            isActive && !chapter.locked && "text-primary"
-                                        )}
-                                    />
                                     <span className="truncate flex-1 text-left">
                                         {idx + 1}. {chapter.title}
                                     </span>
@@ -126,21 +107,20 @@ export default function ChaptersSidebar({
 
     return (
         <SidebarProvider defaultOpen>
-            <div className={cn("relative w-full flex gap-4", className)}>
-                <SidebarRoot
-                    collapsible={collapsible}
-                    className={cn(
-                        "border-r md:static md:block md:h-full md:w-64",
-                        !isMobile && "w-64"
-                    )}
-                >
-                    <ChaptersList chapters={chapters} title={title} />
-                </SidebarRoot>
-                <div className="flex-1 w-full">
-                    <SidebarToggler />
-                    {children}
-                </div>
+            <SidebarRoot
+                collapsible={collapsible}
+                className={cn(
+                    "border-r md:block md:w-64 md:h-full",
+                    !isMobile && "w-64"
+                )}
+            >
+                <ChaptersList chapters={chapters} title={title} />
+            </SidebarRoot>
+            <div className="flex-1 w-full">
+                <SidebarToggler />
+                {children}
             </div>
         </SidebarProvider>
     );
 }
+

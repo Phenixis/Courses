@@ -24,12 +24,28 @@ export async function getChapterByProductIdAndNumero(stripeProductId: string, nu
 }
 
 export async function createChapter(data: NewChapter): Promise<Chapter> {
+    if (await getChapterByProductIdAndNumero(data.stripeProductId, data.numero)) {
+        throw new Error(`Chapter with numero ${data.numero} already exists for product ${data.stripeProductId}`);
+    }
+    
     const [chapter] = await lib.db.insert(chapterTable).values(data).returning();
     return chapter;
 }
 
 export async function updateChapter(id: number, data: Partial<NewChapter>): Promise<Chapter | null> {
     const [chapter] = await lib.db.update(chapterTable).set(data).where(lib.eq(chapterTable.id, id)).returning();
+    return chapter || null;
+}
+
+export async function updateChapterByProductIdAndNumero(stripeProductId: string, numero: number, data: Partial<NewChapter>): Promise<Chapter | null> {
+    const [chapter] = await lib.db.update(chapterTable).set(data)
+    .where(
+        lib.and(
+            lib.eq(chapterTable.stripeProductId, stripeProductId),
+            lib.eq(chapterTable.numero, numero)
+        )
+    )
+    .returning();
     return chapter || null;
 }
 

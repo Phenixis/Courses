@@ -12,13 +12,29 @@ export async function middleware(request: NextRequest) {
 
   const { auth } = NextAuth(authConfig);
   const session = await getSession(auth);
-  const isProtectedRoute = protectedRoutes.includes(pathname);
+  let isProtectedRoute = false;
 
-  if (isProtectedRoute && session === null) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
+  for (const route of protectedRoutes) {
+    if (pathname.startsWith(route)) {
+      isProtectedRoute = true;
+      break;
+    }
   }
 
-  if (session !== null && unaccessibleWhenConnected.includes(pathname)) {
+  if (isProtectedRoute && session === null) {
+    return NextResponse.redirect(new URL('/sign-in?redirect=' + encodeURIComponent(pathname), request.url));
+  }
+
+  let isUnnaccessibleWhenConnected = false;
+
+  for (const route of unaccessibleWhenConnected) {
+    if (pathname.startsWith(route)) {
+      isUnnaccessibleWhenConnected = true;
+      break;
+    }
+  }
+
+  if (session !== null && isUnnaccessibleWhenConnected) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 }

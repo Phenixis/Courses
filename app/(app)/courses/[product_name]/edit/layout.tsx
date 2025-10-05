@@ -3,9 +3,7 @@ import { getStripeProductByTitle } from "@/lib/payments/stripe";
 import { formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import ChaptersSidebar from "@/components/products/chaptersSidebar";
-import ChapterEditor from "@/components/products/chapterEditor";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
-import { Suspense } from "react";
 
 export default async function EditCourseLayout({
     params,

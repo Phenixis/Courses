@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbo --port 3004",
     "build": "next build",
     "start": "next start",
     "db:setup": "npx tsx lib/db/setup.ts",
@@ -33,6 +33,7 @@
     "@types/node": "^22.18.1",
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
+    "@uiw/react-md-editor": "^4.0.8",
     "autoprefixer": "^10.4.21",
     "axios": "^1.11.0",
     "bcryptjs": "^2.4.3",

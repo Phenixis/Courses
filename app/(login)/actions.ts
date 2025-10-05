@@ -83,9 +83,13 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
     return createCheckoutSession({ priceId });
+  } else if (redirectTo) {
+    redirect(redirectTo);
+    return;
   }
 
   redirect('/dashboard');
+  return;
 });
 
 const signUpSchema = z.object({
@@ -199,6 +203,9 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
     return createCheckoutSession({ priceId });
+  } else if (redirectTo) {
+    redirect(redirectTo);
+    return;
   }
 
   redirect('/onboard/sign-up/step-2');

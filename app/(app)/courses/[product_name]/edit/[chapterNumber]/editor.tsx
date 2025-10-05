@@ -52,6 +52,7 @@ export function Editor({
             <MDEditor
                 value={value}
                 onChange={setValue}
+                className="m-2 !h-[85%]"
                 style={{
                     height: "500px",
                 }}

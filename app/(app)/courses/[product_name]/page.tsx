@@ -17,9 +17,6 @@ export default async function CoursePage({
 
     return (
         <div className="flex-1 p-4 lg:p-8">
-            <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100 mb-6">
-                {product.name}
-            </h1>
         </div>
     );
 }

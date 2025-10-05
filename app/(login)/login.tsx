@@ -147,7 +147,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                     <div className="flex items-center justify-between">
                         <Label
                             htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
                             Password
                         </Label>
@@ -201,7 +201,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                     <div className="flex items-center justify-between">
                         <Label
                             htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
                             Password
                         </Label>
@@ -257,7 +257,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                 <div>
                     <Label
                         htmlFor="confirmPassword"
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Confirm Password
                     </Label>
@@ -288,7 +288,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' | 'login
                 <div>
                     <Label
                         htmlFor="confirmPassword"
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Confirm Password
                     </Label>

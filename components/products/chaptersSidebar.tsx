@@ -35,12 +35,19 @@ function ChaptersList({
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const chapterIdParam = searchParams.get("chapterId");
+    const chapterIdParam = pathname.split("/").pop();
     const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
     const isMobile = useIsMobile();
 
     const onSelect = (chapter: Chapter) => {
-        router.push(`${pathname}/${chapter.numero}`);
+        if (chapter.id === activeChapterId) return;
+        if (activeChapterId === 0) {
+            router.push(`${pathname}/${chapter.numero}`);
+        } else {
+            const pathParts = pathname.split("/");
+            pathParts.pop();
+            router.push(`${pathParts.join("/")}/${chapter.numero}`);
+        }
     };
 
     return (

@@ -15,7 +15,7 @@ import { Chapter } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { Menu, Plus } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 
 export interface ChaptersSidebarProps {
@@ -41,17 +41,18 @@ function findBasePathname(pathname: string) {
 function ChaptersList({
     chapters,
     title = "Chapters",
-    isInEdit
+    isInEdit,
+    isAdmin
 }: Pick<
     ChaptersSidebarProps,
     "chapters" | "title" | "isInEdit" | "isAdmin"
 >) {
-    const router = useRouter();
     const pathname = usePathname();
     const basePathname = findBasePathname(pathname);
     const chapterIdParam = pathname.split("/").pop();
-    const activeChapterId = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
+    const activeChapterNumero = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
     const isMobile = useIsMobile();
+    const computedIsInEdit = typeof isInEdit === "boolean" ? isInEdit : pathname.includes("/edit");
 
     return (
         <SidebarContent className="pt-0">
@@ -63,7 +64,7 @@ function ChaptersList({
                         </div>
                     )}
                     {chapters.map((chapter, idx) => {
-                        const isActive = chapter.id === activeChapterId;
+                        const isActive = chapter.numero === activeChapterNumero;
                         return (
                             <SidebarMenuItem key={chapter.id}>
                                 <Link href={'/' + basePathname + '/' + chapter.numero}>
@@ -83,7 +84,7 @@ function ChaptersList({
                             </SidebarMenuItem>
                         );
                     })}
-                    {isInEdit && (
+                    {computedIsInEdit && isAdmin && (
                         <SidebarMenuItem>
                             <Button variant="outline" className="w-full">
                                 <Plus className="mr-2" size={16} />
@@ -103,7 +104,8 @@ export default function ChaptersSidebar({
     className,
     showTriggerOnMobile = true,
     children,
-    isInEdit
+    isInEdit,
+    isAdmin
 }: ChaptersSidebarProps) {
     const isMobile = useIsMobile();
     const collapsible = isMobile ? "offcanvas" : ("none" as const);
@@ -134,7 +136,12 @@ export default function ChaptersSidebar({
                     !isMobile && "w-64"
                 )}
             >
-                <ChaptersList chapters={chapters} title={title} isInEdit={isInEdit} />
+                <ChaptersList
+                    chapters={chapters}
+                    title={title}
+                    isInEdit={isInEdit}
+                    isAdmin={isAdmin}
+                />
             </SidebarRoot>
             <div className="flex-1 w-full">
                 <SidebarToggler />

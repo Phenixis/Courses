@@ -4,9 +4,7 @@ import { formatToSnakeCase, formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import ChaptersSidebar from "@/components/products/chaptersSidebar";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
-import { headers } from "next/headers";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { CourseHeader } from "@/components/products/courseHeader";
 
 export default async function CourseLayout({
     params,
@@ -18,11 +16,9 @@ export default async function CourseLayout({
     const title = formatToTitleCase((await params).product_name);
     const user = await getUser();
 
-    const pathname = (await headers()).get('x-current-path') || '';
-    const inEdit = pathname.includes('/edit');
     const isAdmin = user !== null && user.role === "admin";
 
-    if (!user || (inEdit && !isAdmin)) {
+    if (!user) {
         return redirect('/courses');
     }
 
@@ -33,26 +29,15 @@ export default async function CourseLayout({
     }
 
     const chapters = await getChaptersByProductId(product.id);
+    const productSlug = formatToSnakeCase(product.name);
 
     return (
         <div className="flex-1 p-4 lg:p-8 h-full">
-            <h1 className="text-lg lg:text-2xl font-medium text-gray-900 dark:text-gray-100 mb-6">
-                {product.name}
-                {
-                    inEdit ? ' - [EDIT]' :
-                        isAdmin && (
-                            <Link href={`/courses/${formatToSnakeCase(title)}/edit`}>
-                                <Button variant="outline" className="ml-4 flex-end">
-                                    Edit
-                                </Button>
-                            </Link>
-                        )
-                }
-            </h1>
+            <CourseHeader productName={product.name} productSlug={productSlug} isAdmin={isAdmin} />
             <ChaptersSidebar
                 chapters={chapters}
                 title={product.name}
-                isInEdit={inEdit}
+                isAdmin={isAdmin}
             >
                 {children}
             </ChaptersSidebar>

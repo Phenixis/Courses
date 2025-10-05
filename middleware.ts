@@ -24,7 +24,12 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isProtectedRoute && session === null) {
-    return NextResponse.redirect(new URL('/sign-in?redirect=' + encodeURIComponent(pathname), request.url));
+    return NextResponse.redirect(
+      new URL('/sign-in?redirect=' + encodeURIComponent(pathname), request.url),
+      {
+        headers,
+      },
+    );
   }
 
   let isUnnaccessibleWhenConnected = false;
@@ -37,7 +42,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (session !== null && isUnnaccessibleWhenConnected) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url), { headers });
   }
 
   return NextResponse.next({ headers });

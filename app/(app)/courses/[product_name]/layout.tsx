@@ -1,6 +1,6 @@
 import { getUser } from "@/lib/db/queries";
 import { getStripeProductByTitle } from "@/lib/payments/stripe";
-import { formatToSnakeCase, formatToTitleCase } from "@/lib/utils";
+import { formatToTitleCase } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import ChaptersSidebar from "@/components/products/chaptersSidebar";
 import { getChaptersByProductId } from "@/lib/db/queries/chapter";
@@ -13,7 +13,9 @@ export default async function CourseLayout({
     params: Promise<{ product_name: string }>;
     children: React.ReactNode;
 }) {
-    const title = formatToTitleCase((await params).product_name);
+    const { product_name } = await params;
+    const productSlug = product_name;
+    const title = formatToTitleCase(productSlug);
     const user = await getUser();
 
     const isAdmin = user !== null && user.role === "admin";
@@ -29,7 +31,6 @@ export default async function CourseLayout({
     }
 
     const chapters = await getChaptersByProductId(product.id);
-    const productSlug = formatToSnakeCase(product.name);
 
     return (
         <div className="flex-1 p-4 lg:p-8 h-full">
@@ -38,6 +39,8 @@ export default async function CourseLayout({
                 chapters={chapters}
                 title={product.name}
                 isAdmin={isAdmin}
+                stripeProductId={product.id}
+                productSlug={productSlug}
             >
                 {children}
             </ChaptersSidebar>

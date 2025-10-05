@@ -13,9 +13,10 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Chapter } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Menu, Plus } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
 export interface ChaptersSidebarProps {
@@ -26,6 +27,8 @@ export interface ChaptersSidebarProps {
     children?: React.ReactNode;
     isInEdit?: boolean;
     isAdmin?: boolean;
+    stripeProductId: string;
+    productSlug: string;
 }
 
 function findBasePathname(pathname: string) {
@@ -42,17 +45,47 @@ function ChaptersList({
     chapters,
     title = "Chapters",
     isInEdit,
-    isAdmin
+    isAdmin,
+    stripeProductId,
+    productSlug
 }: Pick<
     ChaptersSidebarProps,
-    "chapters" | "title" | "isInEdit" | "isAdmin"
+    "chapters" | "title" | "isInEdit" | "isAdmin" | "stripeProductId" | "productSlug"
 >) {
     const pathname = usePathname();
+    const router = useRouter();
     const basePathname = findBasePathname(pathname);
     const chapterIdParam = pathname.split("/").pop();
     const activeChapterNumero = chapterIdParam ? parseInt(chapterIdParam, 10) : 0;
     const isMobile = useIsMobile();
     const computedIsInEdit = typeof isInEdit === "boolean" ? isInEdit : pathname.includes("/edit");
+    const [isCreating, setIsCreating] = useState(false);
+
+    const handleAddChapter = async () => {
+        if (isCreating) return;
+        setIsCreating(true);
+        try {
+            const response = await fetch("/api/chapters", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ stripeProductId }),
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err?.error || "Failed to create chapter");
+            }
+
+            const createdChapter: Chapter = await response.json();
+            router.push(`/courses/${productSlug}/edit/${createdChapter.numero}`);
+            router.refresh();
+        } catch (error: any) {
+            console.error("Failed to create chapter", error);
+            alert(error?.message || "Failed to create chapter");
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
     return (
         <SidebarContent className="pt-0">
@@ -86,9 +119,15 @@ function ChaptersList({
                     })}
                     {computedIsInEdit && isAdmin && (
                         <SidebarMenuItem>
-                            <Button variant="outline" className="w-full">
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={handleAddChapter}
+                                disabled={isCreating}
+                                aria-busy={isCreating}
+                            >
                                 <Plus className="mr-2" size={16} />
-                                Add Chapter
+                                {isCreating ? "Creating..." : "Add Chapter"}
                             </Button>
                         </SidebarMenuItem>
                     )}
@@ -105,7 +144,9 @@ export default function ChaptersSidebar({
     showTriggerOnMobile = true,
     children,
     isInEdit,
-    isAdmin
+    isAdmin,
+    stripeProductId,
+    productSlug
 }: ChaptersSidebarProps) {
     const isMobile = useIsMobile();
     const collapsible = isMobile ? "offcanvas" : ("none" as const);
@@ -133,7 +174,8 @@ export default function ChaptersSidebar({
                 collapsible={collapsible}
                 className={cn(
                     "border-r md:block md:w-64 md:h-full",
-                    !isMobile && "w-64"
+                    !isMobile && "w-64",
+                    className
                 )}
             >
                 <ChaptersList
@@ -141,6 +183,8 @@ export default function ChaptersSidebar({
                     title={title}
                     isInEdit={isInEdit}
                     isAdmin={isAdmin}
+                    stripeProductId={stripeProductId}
+                    productSlug={productSlug}
                 />
             </SidebarRoot>
             <div className="flex-1 w-full">

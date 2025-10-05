@@ -52,3 +52,15 @@ export async function updateChapterByProductIdAndNumero(stripeProductId: string,
 export async function deleteChapter(id: number): Promise<void> {
     await lib.db.delete(chapterTable).where(lib.eq(chapterTable.id, id));
 }
+
+export async function getNextChapterNumero(stripeProductId: string): Promise<number> {
+    const [result] = await lib.db
+        .select({
+            maxNumero: lib.sql<number>`coalesce(max(${chapterTable.numero}), 0)`,
+        })
+        .from(chapterTable)
+        .where(lib.eq(chapterTable.stripeProductId, stripeProductId));
+
+    const currentMax = result?.maxNumero ?? 0;
+    return currentMax + 1;
+}

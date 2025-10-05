@@ -6,7 +6,7 @@ import { Chapter } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Editor({
                            chapter,
@@ -14,11 +14,13 @@ export function Editor({
     chapter: Chapter
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [title, setTitle] = useState<string>(chapter.title ?? "");
     const [initialTitle, setInitialTitle] = useState<string>(chapter.title ?? "");
     const [value, setValue] = useState<string>(chapter.content ?? "");
     const [initialValue, setInitialValue] = useState<string>(chapter.content ?? "");
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [hasChanged, setHasChanged] = useState<boolean>(false);
     const [colorMode, setColorMode] = useState<string>("light");
     const [error, setError] = useState<string | null>(null);
@@ -181,10 +183,45 @@ export function Editor({
             />
             <div className="flex justify-end mt-2">
                 <Button
+                    variant="destructive"
+                    size="lg"
+                    className="mr-2"
+                    disabled={isSaving || isDeleting}
+                    onClick={async () => {
+                        if (isDeleting) return;
+                        const confirmed = confirm("Are you sure you want to delete this chapter? This action cannot be undone.");
+                        if (!confirmed) {
+                            return;
+                        }
+                        setIsDeleting(true);
+                        try {
+                            const response = await fetch(`/api/chapters/${chapter.id}`, {
+                                method: "DELETE",
+                            });
+
+                            if (!response.ok) {
+                                const err = await response.json().catch(() => ({}));
+                                throw new Error(err?.error || "Failed to delete chapter");
+                            }
+
+                            const baseEditPath = pathname.replace(/\/edit\/[^/]+$/, "/edit");
+                            router.push(baseEditPath);
+                            router.refresh();
+                        } catch (err: any) {
+                            console.error(err);
+                            alert(err?.message || "Failed to delete chapter");
+                        } finally {
+                            setIsDeleting(false);
+                        }
+                    }}
+                >
+                    {isDeleting ? "Deleting..." : "Delete Chapter"}
+                </Button>
+                <Button
                     onClick={handleSave}
                     variant={"default"}
                     size={"lg"}
-                    disabled={isSaving || !hasChanged}
+                    disabled={isSaving || isDeleting || !hasChanged}
                 >
                     {
                         isSaving ? "Saving..." : !hasChanged ? "No changes" : "Save Changes"

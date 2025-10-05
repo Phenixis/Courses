@@ -64,3 +64,12 @@ export async function getNextChapterNumero(stripeProductId: string): Promise<num
     const currentMax = result?.maxNumero ?? 0;
     return currentMax + 1;
 }
+
+export async function getChapterById(id: number): Promise<Chapter | null> {
+    const [chapter] = await lib.db
+        .select()
+        .from(chapterTable)
+        .where(lib.eq(chapterTable.id, id))
+        .limit(1);
+    return chapter || null;
+}
